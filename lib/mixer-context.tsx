@@ -16,6 +16,7 @@ interface MixerContextType extends MixerState {
   setMasterVolume: (volume: number) => void;
   stopAll: () => void;
   pause: () => void;
+  clearCategory: (category: string) => void;
   toggleMasterPlay: () => void;
 }
 
@@ -82,6 +83,22 @@ export function MixerProvider({ children }: { children: React.ReactNode }) {
     });
   }, [activeSounds]);
 
+  const clearCategory = useCallback((category: string) => {
+    setActiveSounds(prev => {
+      const next = { ...prev };
+      const categorySoundIds = SOUNDS.filter(s => s.category === category).map(s => s.id);
+      
+      categorySoundIds.forEach(id => {
+        if (next[id] !== undefined) {
+          delete next[id];
+          engine.stopSound(id);
+        }
+      });
+      
+      return next;
+    });
+  }, []);
+
   const toggleMasterPlay = useCallback(() => {
     setIsPlaying(prev => {
       const next = !prev;
@@ -113,6 +130,7 @@ export function MixerProvider({ children }: { children: React.ReactNode }) {
       setMasterVolume,
       stopAll,
       pause,
+      clearCategory,
       toggleMasterPlay
     }}>
       {children}

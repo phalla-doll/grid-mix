@@ -3,16 +3,21 @@
 import React from 'react';
 import { SOUNDS, SoundCategory } from '@/lib/sounds';
 import { SoundTile } from './SoundTile';
+import { useMixer } from '@/lib/mixer-context';
+import { X } from 'lucide-react';
 
 const CATEGORIES: SoundCategory[] = ['Nature', 'Urban', 'Noise', 'Synth'];
 
 export function SoundGrid() {
+  const { activeSounds, clearCategory } = useMixer();
+
   return (
     <main className="flex-1 pb-32">
       {CATEGORIES.map((category, index) => {
         const categorySounds = SOUNDS.filter(s => s.category === category);
         if (categorySounds.length === 0) return null;
 
+        const hasActiveSounds = categorySounds.some(s => activeSounds[s.id] !== undefined);
         const sectionNumber = String(index + 1).padStart(2, '0');
 
         return (
@@ -22,9 +27,19 @@ export function SoundGrid() {
                 <span className="text-[11px] font-mono text-[#888] tracking-widest uppercase">
                   [{sectionNumber}] {category}
                 </span>
-                <span className="text-[11px] font-mono text-[#555] tracking-widest uppercase">
-                  / SOUNDS
-                </span>
+                {hasActiveSounds ? (
+                  <button 
+                    onClick={() => clearCategory(category)}
+                    className="flex items-center gap-1.5 text-[11px] font-mono text-[#888] hover:text-white transition-colors tracking-widest uppercase"
+                  >
+                    <X className="w-3 h-3" />
+                    CLEAR
+                  </button>
+                ) : (
+                  <span className="text-[11px] font-mono text-[#555] tracking-widest uppercase">
+                    / SOUNDS
+                  </span>
+                )}
               </div>
             </div>
 
