@@ -2,12 +2,13 @@
 
 import React, { useState, useEffect } from 'react';
 import { useMixer } from '@/lib/mixer-context';
-import { Play, Square, Volume2, Timer as TimerIcon, X } from 'lucide-react';
+import { Play, Square, Volume2, Timer as TimerIcon, X, Bookmark, Trash2 } from 'lucide-react';
 
 export function TopNav() {
-  const { isPlaying, toggleMasterPlay, masterVolume, setMasterVolume, pause } = useMixer();
+  const { isPlaying, toggleMasterPlay, masterVolume, setMasterVolume, pause, savedMixes, loadMix, deleteMix } = useMixer();
   
   const [isTimerOpen, setIsTimerOpen] = useState(false);
+  const [isPresetsOpen, setIsPresetsOpen] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
   const [customMinutes, setCustomMinutes] = useState<string>('30');
 
@@ -89,6 +90,14 @@ export function TopNav() {
                 <Play className="w-3 h-3 text-white fill-white ml-0.5" />
               )}
             </button>
+
+            <button
+              onClick={() => setIsPresetsOpen(true)}
+              className="flex items-center justify-center w-8 h-8 border border-[#444] bg-black hover:bg-[#111] transition-colors text-[#a1a1a1] hover:text-white"
+              title="Load Preset"
+            >
+              <Bookmark className="w-4 h-4" />
+            </button>
           </div>
         </div>
       </header>
@@ -142,6 +151,57 @@ export function TopNav() {
                 >
                   Cancel Active Timer
                 </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Presets Dialog */}
+      {isPresetsOpen && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+          <div className="w-full max-w-md bg-[#0a0a0a] border border-[#222] shadow-2xl flex flex-col max-h-[80vh]">
+            <div className="h-12 border-b border-[#222] flex items-center justify-between px-4 sm:px-6 flex-shrink-0">
+              <span className="text-[11px] font-mono text-[#888] tracking-widest uppercase">
+                [PRESETS] / LOAD
+              </span>
+              <button onClick={() => setIsPresetsOpen(false)} className="text-[#888] hover:text-white transition-colors">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            
+            <div className="p-4 sm:p-6 flex flex-col gap-4 overflow-y-auto no-scrollbar">
+              {savedMixes.length === 0 ? (
+                <div className="text-center py-8 text-[#555] font-mono text-sm">
+                  No saved presets yet.
+                </div>
+              ) : (
+                <div className="flex flex-col gap-2">
+                  {savedMixes.map(mix => (
+                    <div key={mix.id} className="flex items-center justify-between p-3 border border-[#333] bg-[#111] hover:border-[#555] transition-colors group">
+                      <span className="text-sm font-medium text-[#e0e0e0] truncate pr-4">{mix.name}</span>
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <button
+                          onClick={() => {
+                            loadMix(mix.mixStr);
+                            setIsPresetsOpen(false);
+                          }}
+                          className="flex items-center gap-2 px-3 h-8 border border-[#444] bg-white text-black hover:bg-[#e0e0e0] transition-colors text-xs font-bold uppercase tracking-widest"
+                        >
+                          <Play className="w-3 h-3 fill-current" />
+                          Play
+                        </button>
+                        <button
+                          onClick={() => deleteMix(mix.id)}
+                          className="flex items-center justify-center w-8 h-8 border border-[#444] bg-black text-[#888] hover:text-red-500 hover:border-red-500/50 transition-colors"
+                          title="Delete Preset"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               )}
             </div>
           </div>

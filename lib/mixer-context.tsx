@@ -23,10 +23,17 @@ export const deserializeMix = (mixStr: string): Record<string, number> => {
   return sounds;
 };
 
+export interface SavedMix {
+  id: string;
+  name: string;
+  mixStr: string;
+}
+
 interface MixerState {
   activeSounds: Record<string, number>; // id -> volume (0-1)
   masterVolume: number;
   isPlaying: boolean;
+  savedMixes: SavedMix[];
 }
 
 interface MixerContextType extends MixerState {
@@ -37,7 +44,9 @@ interface MixerContextType extends MixerState {
   pause: () => void;
   clearCategory: (category: string) => void;
   toggleMasterPlay: () => void;
-  saveMix: () => void;
+  saveMix: (name: string) => void;
+  loadMix: (mixStr: string) => void;
+  deleteMix: (id: string) => void;
 }
 
 const MixerContext = createContext<MixerContextType | undefined>(undefined);
@@ -47,6 +56,7 @@ export function MixerProvider({ children }: { children: React.ReactNode }) {
   const [masterVolume, setMasterVolumeState] = useState(0.5);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [savedMixes, setSavedMixes] = useState<SavedMix[]>([]);
 
   // Load from URL or LocalStorage on mount
   useEffect(() => {
@@ -61,6 +71,14 @@ export function MixerProvider({ children }: { children: React.ReactNode }) {
         setActiveSounds(deserializeMix(savedSession));
       }
     }
+
+    const savedPresets = localStorage.getItem('gridmix_saved_mixes');
+    if (savedPresets) {
+      try {
+        setSavedMixes(JSON.parse(savedPresets));
+      } catch (e) {}
+    }
+
     setIsInitialized(true);
   }, []);
 
@@ -189,16 +207,43 @@ export function MixerProvider({ children }: { children: React.ReactNode }) {
     });
   }, [activeSounds]);
 
-  const saveMix = useCallback(() => {
+  const saveMix = useCallback((name: string) => {
     const mixStr = serializeMix(activeSounds);
-    localStorage.setItem('gridmix_saved_mix', mixStr);
+    const newMix: SavedMix = { id: Date.now().toString(), name, mixStr };
+    setSavedMixes(prev => {
+      const next = [...prev, newMix];
+      localStorage.setItem('gridmix_saved_mixes', JSON.stringify(next));
+      return next;
+    });
   }, [activeSounds]);
+
+  const loadMix = useCallback((mixStr: string) => {
+    const sounds = deserializeMix(mixStr);
+    Object.keys(activeSounds).forEach(id => engine.stopSound(id));
+    setActiveSounds(sounds);
+    setIsPlaying(true);
+    Object.entries(sounds).forEach(([id, vol]) => {
+      const soundDef = SOUNDS.find(s => s.id === id);
+      if (soundDef) {
+        engine.playSound(soundDef, vol);
+      }
+    });
+  }, [activeSounds]);
+
+  const deleteMix = useCallback((id: string) => {
+    setSavedMixes(prev => {
+      const next = prev.filter(m => m.id !== id);
+      localStorage.setItem('gridmix_saved_mixes', JSON.stringify(next));
+      return next;
+    });
+  }, []);
 
   return (
     <MixerContext.Provider value={{
       activeSounds,
       masterVolume,
       isPlaying,
+      savedMixes,
       toggleSound,
       setVolume,
       setMasterVolume,
@@ -206,7 +251,9 @@ export function MixerProvider({ children }: { children: React.ReactNode }) {
       pause,
       clearCategory,
       toggleMasterPlay,
-      saveMix
+      saveMix,
+      loadMix,
+      deleteMix
     }}>
       {children}
     </MixerContext.Provider>
