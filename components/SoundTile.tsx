@@ -26,11 +26,11 @@ export function SoundTile({ sound }: SoundTileProps) {
   return (
     <div 
       className={`
-        flex flex-col justify-between p-5 h-[140px] transition-all duration-[120ms] ease-out
-        bg-[#111] border group
+        flex flex-col justify-between p-6 h-[160px] transition-all duration-[120ms] ease-out
+        border-b border-r border-[#222] group
         ${isActive 
-          ? 'border-white shadow-[0_0_15px_rgba(255,255,255,0.05)]' 
-          : 'border-[#333] hover:border-[#555] hover:bg-[#151515]'}
+          ? 'bg-[#1a1a1a]' 
+          : 'bg-transparent hover:bg-[#111]'}
       `}
     >
       <div className="flex justify-between items-start">

@@ -29,8 +29,8 @@ export function SoundGrid() {
             </div>
 
             <div className="w-full flex justify-center">
-              <div className="max-w-7xl w-full mx-auto px-6 py-12">
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6">
+              <div className="max-w-7xl w-full mx-auto">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
                   {categorySounds.map(sound => (
                     <SoundTile key={sound.id} sound={sound} />
                   ))}
