@@ -25,9 +25,10 @@ export function SoundTile({ sound }: SoundTileProps) {
 
   return (
     <div 
+      onClick={handleToggle}
       className={`
         flex flex-col justify-between p-6 h-[160px] transition-all duration-[120ms] ease-out
-        border-b border-r border-[#222] group
+        border-b border-r border-[#222] group cursor-pointer
         ${isActive 
           ? 'bg-[#1a1a1a]' 
           : 'bg-transparent hover:bg-[#111]'}
@@ -54,36 +55,34 @@ export function SoundTile({ sound }: SoundTileProps) {
         </div>
       </div>
 
-      <div className="flex items-center gap-4 mt-auto">
-        <button
-          onClick={handleToggle}
-          className={`
-            flex-shrink-0 flex items-center justify-center w-9 h-9 border transition-colors
-            ${isActive 
-              ? 'border-white bg-white text-black hover:bg-[#e0e0e0]' 
-              : 'border-[#444] bg-black text-white hover:bg-[#222]'}
-          `}
+      {isActive && (
+        <div 
+          className="flex items-center gap-4 mt-auto"
+          onClick={(e) => e.stopPropagation()}
         >
-          {isActive ? (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleToggle();
+            }}
+            className="flex-shrink-0 flex items-center justify-center w-9 h-9 border transition-colors border-white bg-white text-black hover:bg-[#e0e0e0]"
+          >
             <Square className="w-3.5 h-3.5 fill-current" />
-          ) : (
-            <Play className="w-3.5 h-3.5 fill-current ml-0.5" />
-          )}
-        </button>
+          </button>
 
-        <div className={`flex-grow transition-opacity duration-200 ${isActive ? 'opacity-100' : 'opacity-30 group-hover:opacity-60'}`}>
-          <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.01"
-            value={volume}
-            onChange={handleVolumeChange}
-            className="w-full"
-            disabled={!isActive}
-          />
+          <div className="flex-grow transition-opacity duration-200 opacity-100">
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.01"
+              value={volume}
+              onChange={handleVolumeChange}
+              className="w-full"
+            />
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
