@@ -15,6 +15,7 @@ interface MixerContextType extends MixerState {
   setVolume: (id: string, volume: number) => void;
   setMasterVolume: (volume: number) => void;
   stopAll: () => void;
+  pause: () => void;
   toggleMasterPlay: () => void;
 }
 
@@ -74,6 +75,13 @@ export function MixerProvider({ children }: { children: React.ReactNode }) {
     setIsPlaying(false);
   }, []);
 
+  const pause = useCallback(() => {
+    setIsPlaying(false);
+    Object.keys(activeSounds).forEach(id => {
+      engine.stopSound(id);
+    });
+  }, [activeSounds]);
+
   const toggleMasterPlay = useCallback(() => {
     setIsPlaying(prev => {
       const next = !prev;
@@ -104,6 +112,7 @@ export function MixerProvider({ children }: { children: React.ReactNode }) {
       setVolume,
       setMasterVolume,
       stopAll,
+      pause,
       toggleMasterPlay
     }}>
       {children}
