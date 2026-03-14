@@ -27,7 +27,7 @@ export function SoundTile({ sound }: SoundTileProps) {
     <div 
       onClick={handleToggle}
       className={`
-        flex flex-col justify-between p-6 h-[160px] transition-all duration-[120ms] ease-out
+        flex flex-col justify-between p-4 sm:p-6 h-[160px] transition-all duration-[120ms] ease-out
         border-b border-r border-[#222] group cursor-pointer
         ${isActive 
           ? 'bg-[#1a1a1a]' 
@@ -57,7 +57,7 @@ export function SoundTile({ sound }: SoundTileProps) {
 
       {isActive && (
         <div 
-          className="flex items-center gap-4 mt-auto"
+          className="flex items-center gap-2 sm:gap-4 mt-auto"
           onClick={(e) => e.stopPropagation()}
         >
           <button
@@ -65,9 +65,9 @@ export function SoundTile({ sound }: SoundTileProps) {
               e.stopPropagation();
               handleToggle();
             }}
-            className="flex-shrink-0 flex items-center justify-center w-9 h-9 border transition-colors border-white bg-white text-black hover:bg-[#e0e0e0]"
+            className="flex-shrink-0 flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 border transition-colors border-white bg-white text-black hover:bg-[#e0e0e0]"
           >
-            <Square className="w-3.5 h-3.5 fill-current" />
+            <Square className="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-current" />
           </button>
 
           <div className="flex-grow transition-opacity duration-200 opacity-100">

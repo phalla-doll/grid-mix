@@ -46,12 +46,12 @@ export function TopNav() {
   return (
     <>
       <header className="h-14 border-b border-[#222] bg-[#0a0a0a] sticky top-0 z-50 flex items-center">
-        <div className="max-w-7xl mx-auto w-full px-6 flex items-center justify-between">
-          <div className="flex items-center gap-8">
-            <h1 className="text-lg font-bold tracking-tight text-white uppercase">GridMix</h1>
+        <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 flex items-center justify-between">
+          <div className="flex items-center gap-4 sm:gap-8">
+            <h1 className="text-base sm:text-lg font-bold tracking-tight text-white uppercase">GridMix</h1>
           </div>
 
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4 sm:gap-6">
             <button
               onClick={() => setIsTimerOpen(true)}
               className={`flex items-center justify-center border border-[#444] bg-black hover:bg-[#111] transition-colors text-[#a1a1a1] hover:text-white ${
@@ -95,9 +95,9 @@ export function TopNav() {
 
       {/* Timer Dialog */}
       {isTimerOpen && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
           <div className="w-full max-w-sm bg-[#0a0a0a] border border-[#222] shadow-2xl flex flex-col">
-            <div className="h-12 border-b border-[#222] flex items-center justify-between px-6">
+            <div className="h-12 border-b border-[#222] flex items-center justify-between px-4 sm:px-6">
               <span className="text-[11px] font-mono text-[#888] tracking-widest uppercase">
                 [TIMER] / SET
               </span>
@@ -106,8 +106,8 @@ export function TopNav() {
               </button>
             </div>
             
-            <div className="p-6 flex flex-col gap-6">
-              <div className="grid grid-cols-3 gap-3">
+            <div className="p-4 sm:p-6 flex flex-col gap-6">
+              <div className="grid grid-cols-3 gap-2 sm:gap-3">
                 {[15, 30, 45, 60, 90, 120].map(mins => (
                   <button
                     key={mins}

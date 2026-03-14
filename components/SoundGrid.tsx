@@ -14,11 +14,11 @@ export function SoundGrid() {
   return (
     <main className="flex-1 pb-12">
       <div className="w-full flex justify-center border-b border-[#222]">
-        <div className="max-w-7xl w-full mx-auto px-6 py-20 md:py-28">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium text-white mb-6 tracking-tight max-w-3xl">
+        <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 py-16 sm:py-20 md:py-28">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-medium text-white mb-4 sm:mb-6 tracking-tight max-w-3xl">
             Focus starts with the right sound.
           </h1>
-          <p className="text-[#888] text-lg md:text-xl max-w-2xl leading-relaxed">
+          <p className="text-[#888] text-base sm:text-lg md:text-xl max-w-2xl leading-relaxed">
             Mix nature, noise, and ambient environments to create your perfect space for work, rest, or sleep.
           </p>
         </div>
@@ -34,20 +34,20 @@ export function SoundGrid() {
         return (
           <div key={category} className="flex flex-col border-b border-[#222]">
             <div className="h-12 border-b border-[#222] flex items-center justify-center">
-              <div className="max-w-7xl w-full mx-auto px-6 flex justify-between items-center">
-                <span className="text-[11px] font-mono text-[#888] tracking-widest uppercase">
+              <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 flex justify-between items-center">
+                <span className="text-[10px] sm:text-[11px] font-mono text-[#888] tracking-widest uppercase">
                   [{sectionNumber}] {category}
                 </span>
                 {hasActiveSounds ? (
                   <button 
                     onClick={() => clearCategory(category)}
-                    className="flex items-center gap-1.5 text-[11px] font-mono text-[#888] hover:text-white transition-colors tracking-widest uppercase"
+                    className="flex items-center gap-1.5 text-[10px] sm:text-[11px] font-mono text-[#888] hover:text-white transition-colors tracking-widest uppercase"
                   >
                     <X className="w-3 h-3" />
                     CLEAR
                   </button>
                 ) : (
-                  <span className="text-[11px] font-mono text-[#555] tracking-widest uppercase">
+                  <span className="text-[10px] sm:text-[11px] font-mono text-[#555] tracking-widest uppercase">
                     / SOUNDS
                   </span>
                 )}
@@ -83,15 +83,15 @@ export function SoundGrid() {
 
       {/* Footer Row */}
       <div className="w-full flex justify-center border-b border-[#222] h-12 bg-[#0a0a0a]">
-        <div className="max-w-7xl w-full mx-auto px-6 flex justify-between items-center">
-          <span className="text-[11px] font-mono text-[#555] tracking-widest uppercase">
+        <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 flex justify-between items-center">
+          <span className="text-[10px] sm:text-[11px] font-mono text-[#555] tracking-widest uppercase">
             Crafted by Mantha
           </span>
           <a 
             href="https://github.com/phalla-doll/grid-mix" 
             target="_blank" 
             rel="noopener noreferrer"
-            className="text-[11px] font-mono text-[#555] hover:text-white transition-colors tracking-widest uppercase"
+            className="text-[10px] sm:text-[11px] font-mono text-[#555] hover:text-white transition-colors tracking-widest uppercase"
           >
             / GITHUB
           </a>
