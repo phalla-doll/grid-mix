@@ -4,6 +4,25 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import { SoundDef, SOUNDS } from './sounds';
 import { engine } from './audio-engine';
 
+export const serializeMix = (sounds: Record<string, number>) => {
+  return Object.entries(sounds)
+    .map(([id, vol]) => `${id}_${Math.round(vol * 100)}`)
+    .join('-');
+};
+
+export const deserializeMix = (mixStr: string): Record<string, number> => {
+  const sounds: Record<string, number> = {};
+  if (!mixStr) return sounds;
+  mixStr.split('-').forEach(part => {
+    const [id, volStr] = part.split('_');
+    const vol = parseInt(volStr, 10);
+    if (id && !isNaN(vol)) {
+      sounds[id] = vol / 100;
+    }
+  });
+  return sounds;
+};
+
 interface MixerState {
   activeSounds: Record<string, number>; // id -> volume (0-1)
   masterVolume: number;
@@ -18,6 +37,7 @@ interface MixerContextType extends MixerState {
   pause: () => void;
   clearCategory: (category: string) => void;
   toggleMasterPlay: () => void;
+  saveMix: () => void;
 }
 
 const MixerContext = createContext<MixerContextType | undefined>(undefined);
@@ -26,6 +46,39 @@ export function MixerProvider({ children }: { children: React.ReactNode }) {
   const [activeSounds, setActiveSounds] = useState<Record<string, number>>({});
   const [masterVolume, setMasterVolumeState] = useState(0.5);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // Load from URL or LocalStorage on mount
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const mixParam = params.get('mix');
+    
+    if (mixParam) {
+      setActiveSounds(deserializeMix(mixParam));
+    } else {
+      const savedSession = localStorage.getItem('gridmix_current_session');
+      if (savedSession) {
+        setActiveSounds(deserializeMix(savedSession));
+      }
+    }
+    setIsInitialized(true);
+  }, []);
+
+  // Save to URL and LocalStorage on change
+  useEffect(() => {
+    if (!isInitialized) return;
+    
+    const mixStr = serializeMix(activeSounds);
+    localStorage.setItem('gridmix_current_session', mixStr);
+    
+    const url = new URL(window.location.href);
+    if (mixStr) {
+      url.searchParams.set('mix', mixStr);
+    } else {
+      url.searchParams.delete('mix');
+    }
+    window.history.replaceState({}, '', url.toString());
+  }, [activeSounds, isInitialized]);
 
   // Initialize audio engine on first interaction
   useEffect(() => {
@@ -136,6 +189,11 @@ export function MixerProvider({ children }: { children: React.ReactNode }) {
     });
   }, [activeSounds]);
 
+  const saveMix = useCallback(() => {
+    const mixStr = serializeMix(activeSounds);
+    localStorage.setItem('gridmix_saved_mix', mixStr);
+  }, [activeSounds]);
+
   return (
     <MixerContext.Provider value={{
       activeSounds,
@@ -147,7 +205,8 @@ export function MixerProvider({ children }: { children: React.ReactNode }) {
       stopAll,
       pause,
       clearCategory,
-      toggleMasterPlay
+      toggleMasterPlay,
+      saveMix
     }}>
       {children}
     </MixerContext.Provider>
