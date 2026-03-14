@@ -40,13 +40,25 @@ export function MixerProvider({ children }: { children: React.ReactNode }) {
   const toggleSound = useCallback((id: string) => {
     setActiveSounds(prev => {
       const next = { ...prev };
+      const isCurrentlyEmpty = Object.keys(prev).length === 0;
+
       if (next[id] !== undefined) {
         delete next[id];
         engine.stopSound(id);
+        
+        if (Object.keys(next).length === 0) {
+          setIsPlaying(false);
+        }
       } else {
         next[id] = 0.5; // Default volume
         const soundDef = SOUNDS.find(s => s.id === id);
-        if (soundDef && isPlaying) {
+        
+        if (isCurrentlyEmpty) {
+          setIsPlaying(true);
+          if (soundDef) {
+            engine.playSound(soundDef, 0.5);
+          }
+        } else if (soundDef && isPlaying) {
           engine.playSound(soundDef, 0.5);
         }
       }
@@ -94,6 +106,10 @@ export function MixerProvider({ children }: { children: React.ReactNode }) {
           engine.stopSound(id);
         }
       });
+      
+      if (Object.keys(next).length === 0) {
+        setIsPlaying(false);
+      }
       
       return next;
     });
