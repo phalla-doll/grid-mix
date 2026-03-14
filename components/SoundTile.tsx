@@ -35,21 +35,23 @@ export function SoundTile({ sound }: SoundTileProps) {
     >
       <div className="flex justify-between items-start">
         <div>
-          <h3 className={`text-sm font-medium ${isActive ? 'text-white' : 'text-[#e0e0e0]'}`}>
-            {sound.name}
-          </h3>
+          <div className="flex items-center gap-3">
+            <h3 className={`text-sm font-medium ${isActive ? 'text-white' : 'text-[#e0e0e0]'}`}>
+              {sound.name}
+            </h3>
+            {isActive && isPlaying && (
+              <div className="flex gap-[2px] h-3 items-end opacity-50">
+                <div className="w-[1px] bg-white animate-[pulse_1s_ease-in-out_infinite]" style={{ height: '40%' }}></div>
+                <div className="w-[1px] bg-white animate-[pulse_1.2s_ease-in-out_infinite_0.2s]" style={{ height: '100%' }}></div>
+                <div className="w-[1px] bg-white animate-[pulse_0.8s_ease-in-out_infinite_0.4s]" style={{ height: '60%' }}></div>
+                <div className="w-[1px] bg-white animate-[pulse_1.1s_ease-in-out_infinite_0.1s]" style={{ height: '80%' }}></div>
+              </div>
+            )}
+          </div>
           <p className="text-[11px] text-[#888] uppercase tracking-wider mt-1 font-mono">
             {sound.category}
           </p>
         </div>
-        
-        {isActive && isPlaying && (
-          <div className="flex gap-1 h-3 items-end opacity-60">
-            <div className="w-1 bg-white animate-[pulse_1s_ease-in-out_infinite]" style={{ height: '40%' }}></div>
-            <div className="w-1 bg-white animate-[pulse_1.2s_ease-in-out_infinite_0.2s]" style={{ height: '80%' }}></div>
-            <div className="w-1 bg-white animate-[pulse_0.8s_ease-in-out_infinite_0.4s]" style={{ height: '60%' }}></div>
-          </div>
-        )}
       </div>
 
       <div className="flex items-center gap-4 mt-auto">

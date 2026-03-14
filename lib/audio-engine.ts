@@ -29,7 +29,8 @@ class AudioEngine {
     }
 
     const gainNode = this.ctx.createGain();
-    gainNode.gain.value = volume;
+    gainNode.gain.setValueAtTime(0, this.ctx.currentTime);
+    gainNode.gain.linearRampToValueAtTime(volume, this.ctx.currentTime + 1.0); // 1s fade in
     gainNode.connect(this.masterGain);
 
     let source: AudioNode;
@@ -104,7 +105,9 @@ class AudioEngine {
     if (node) {
       // Smooth volume transition
       if (this.ctx) {
-         node.gain.gain.setTargetAtTime(volume, this.ctx.currentTime, 0.1);
+         node.gain.gain.cancelScheduledValues(this.ctx.currentTime);
+         node.gain.gain.setValueAtTime(node.gain.gain.value, this.ctx.currentTime);
+         node.gain.gain.linearRampToValueAtTime(volume, this.ctx.currentTime + 0.2);
       } else {
          node.gain.gain.value = volume;
       }
@@ -113,16 +116,28 @@ class AudioEngine {
 
   stopSound(id: string) {
     const node = this.activeNodes.get(id);
-    if (node) {
+    if (node && this.ctx) {
+      const fadeOutTime = 1.0; // 1 second fade out
+      
+      node.gain.gain.cancelScheduledValues(this.ctx.currentTime);
+      node.gain.gain.setValueAtTime(node.gain.gain.value, this.ctx.currentTime);
+      node.gain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + fadeOutTime);
+
       if (node.source instanceof AudioBufferSourceNode || node.source instanceof OscillatorNode) {
-        node.source.stop();
+        node.source.stop(this.ctx.currentTime + fadeOutTime);
       }
       if (node.lfo) {
-        node.lfo.stop();
+        node.lfo.stop(this.ctx.currentTime + fadeOutTime);
       }
-      node.source.disconnect();
-      node.gain.disconnect();
+      
       this.activeNodes.delete(id);
+      
+      setTimeout(() => {
+        try {
+          node.source.disconnect();
+          node.gain.disconnect();
+        } catch (e) {}
+      }, fadeOutTime * 1000 + 100);
     }
   }
 
