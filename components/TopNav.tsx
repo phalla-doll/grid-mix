@@ -52,19 +52,18 @@ export function TopNav() {
           </div>
 
           <div className="flex items-center gap-6">
-            {timeRemaining !== null && (
-              <div className="text-xs font-mono text-[#888] flex items-center gap-2 border border-[#333] px-3 py-1.5 bg-[#111]">
-                <TimerIcon className="w-3 h-3" />
-                {formatTime(timeRemaining)}
-              </div>
-            )}
-            
             <button
               onClick={() => setIsTimerOpen(true)}
-              className="flex items-center justify-center w-8 h-8 border border-[#444] bg-black hover:bg-[#111] transition-colors text-[#a1a1a1] hover:text-white"
-              title="Set Timer"
+              className={`flex items-center justify-center border border-[#444] bg-black hover:bg-[#111] transition-colors text-[#a1a1a1] hover:text-white ${
+                timeRemaining !== null ? 'h-8 px-3' : 'w-8 h-8'
+              }`}
+              title={timeRemaining !== null ? "Edit Timer" : "Set Timer"}
             >
-              <TimerIcon className="w-4 h-4" />
+              {timeRemaining !== null ? (
+                <span className="text-xs font-mono tracking-wider">{formatTime(timeRemaining)}</span>
+              ) : (
+                <TimerIcon className="w-4 h-4" />
+              )}
             </button>
 
             <div className="flex items-center gap-3 w-32 hidden sm:flex">
