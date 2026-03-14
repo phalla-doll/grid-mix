@@ -13,6 +13,17 @@ export function SoundGrid() {
 
   return (
     <main className="flex-1 pb-32">
+      <div className="w-full flex justify-center border-b border-[#222]">
+        <div className="max-w-7xl w-full mx-auto px-6 py-20 md:py-28">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium text-white mb-6 tracking-tight max-w-3xl">
+            Focus starts with the right sound.
+          </h1>
+          <p className="text-[#888] text-lg md:text-xl max-w-2xl leading-relaxed">
+            Mix nature, noise, and ambient environments to create your perfect space for work, rest, or sleep.
+          </p>
+        </div>
+      </div>
+
       {CATEGORIES.map((category, index) => {
         const categorySounds = SOUNDS.filter(s => s.category === category);
         if (categorySounds.length === 0) return null;
