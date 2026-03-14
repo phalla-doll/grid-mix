@@ -12,7 +12,7 @@ export function SoundGrid() {
   const { activeSounds, clearCategory } = useMixer();
 
   return (
-    <main className="flex-1 pb-32">
+    <main className="flex-1 pb-12">
       <div className="w-full flex justify-center border-b border-[#222]">
         <div className="max-w-7xl w-full mx-auto px-6 py-20 md:py-28">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium text-white mb-6 tracking-tight max-w-3xl">
@@ -66,6 +66,32 @@ export function SoundGrid() {
           </div>
         );
       })}
+
+      {/* Empty Row */}
+      <div className="w-full flex justify-center border-b border-[#222] h-[160px]">
+        <div className="max-w-7xl w-full mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 h-full">
+            <div className="border-r border-[#222] h-full"></div>
+            <div className="border-r border-[#222] h-full"></div>
+            <div className="border-r border-[#222] h-full hidden md:block"></div>
+            <div className="border-r border-[#222] h-full hidden lg:block"></div>
+            <div className="border-r border-[#222] h-full hidden xl:block"></div>
+            <div className="border-r border-[#222] h-full hidden xl:block"></div>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer Row */}
+      <div className="w-full flex justify-center border-b border-[#222] h-12 bg-[#0a0a0a]">
+        <div className="max-w-7xl w-full mx-auto px-6 flex justify-between items-center">
+          <span className="text-[11px] font-mono text-[#555] tracking-widest uppercase">
+            Built with Google AI Studio
+          </span>
+          <span className="text-[11px] font-mono text-[#555] tracking-widest uppercase">
+            / CREDITS
+          </span>
+        </div>
+      </div>
     </main>
   );
 }
