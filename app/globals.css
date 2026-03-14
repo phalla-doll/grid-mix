@@ -17,14 +17,6 @@ body {
   color: var(--color-grid-text-primary);
 }
 
-.bg-grid-pattern {
-  background-image:
-    linear-gradient(var(--color-grid-line) 1px, transparent 1px),
-    linear-gradient(90deg, var(--color-grid-line) 1px, transparent 1px);
-  background-size: 24px 24px;
-  background-position: center;
-}
-
 /* Custom minimal slider */
 input[type=range] {
   -webkit-appearance: none;

@@ -16,8 +16,8 @@ export function SoundGrid() {
         const sectionNumber = String(index + 1).padStart(2, '0');
 
         return (
-          <div key={category} className="flex flex-col">
-            <div className="h-12 border-b border-[#222] bg-grid-pattern flex items-center justify-center">
+          <div key={category} className="flex flex-col border-b border-[#222]">
+            <div className="h-12 border-b border-[#222] flex items-center justify-center">
               <div className="max-w-7xl w-full mx-auto px-6 flex justify-between items-center">
                 <span className="text-[11px] font-mono text-[#888] tracking-widest uppercase">
                   [{sectionNumber}] {category}
@@ -28,11 +28,13 @@ export function SoundGrid() {
               </div>
             </div>
 
-            <div className="max-w-7xl w-full mx-auto px-6 py-12">
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6">
-                {categorySounds.map(sound => (
-                  <SoundTile key={sound.id} sound={sound} />
-                ))}
+            <div className="w-full flex justify-center">
+              <div className="max-w-7xl w-full mx-auto px-6 py-12">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6">
+                  {categorySounds.map(sound => (
+                    <SoundTile key={sound.id} sound={sound} />
+                  ))}
+                </div>
               </div>
             </div>
           </div>
