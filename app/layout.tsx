@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     description: 'A developer-style minimalist ambient sound mixer with a sharp geometric UI.',
     images: [
       {
-        url: '/sono-og-image-main.png',
+        url: '/soro-og-image-main.png',
         width: 1200,
         height: 630,
         alt: 'Soro ambient sound mixer preview',
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Soro | Ambient Sound Mixer',
     description: 'A developer-style minimalist ambient sound mixer with a sharp geometric UI.',
-    images: ['/sono-og-image-main.png'],
+    images: ['/soro-og-image-main.png'],
   },
   icons: {
     icon: [
