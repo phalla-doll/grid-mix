@@ -36,7 +36,18 @@ class AudioEngine {
         cancelAnimationFrame(node.fadeFrame);
         node.fadeFrame = null;
       }
-      this.applyVolume(node, node.baseVolume);
+      const targetVolume = this.effectiveVolume(node.baseVolume);
+
+      if (node.gainNode && this.audioContext) {
+        const now = this.audioContext.currentTime;
+        const gain = node.gainNode.gain;
+        gain.cancelScheduledValues(now);
+        gain.setValueAtTime(gain.value, now);
+        gain.linearRampToValueAtTime(targetVolume, now + 0.04);
+        return;
+      }
+
+      this.fadeVolume(node, this.getCurrentOutputVolume(node), targetVolume, 80);
     });
   }
 

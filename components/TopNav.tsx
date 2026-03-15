@@ -21,11 +21,24 @@ export const TopNav = memo(function TopNav() {
   const mobileVolumeRef = useRef<HTMLDivElement>(null);
   const prevVolumeRef = useRef(masterVolume);
   const pauseFnRef = useRef(pause);
+  const masterVolumeRafRef = useRef<number | null>(null);
+  const pendingMasterVolumeRef = useRef(masterVolume);
   const mobileVolumePanelId = 'mobile-master-volume-panel';
   
   useEffect(() => {
     pauseFnRef.current = pause;
   }, [pause]);
+
+  useEffect(() => {
+    pendingMasterVolumeRef.current = masterVolume;
+  }, [masterVolume]);
+
+  useEffect(() => () => {
+    if (masterVolumeRafRef.current !== null) {
+      cancelAnimationFrame(masterVolumeRafRef.current);
+      masterVolumeRafRef.current = null;
+    }
+  }, []);
 
   useEffect(() => {
     if (!isMobileVolumeOpen) return;
@@ -38,12 +51,32 @@ export const TopNav = memo(function TopNav() {
     };
 
     document.addEventListener('mousedown', handlePointerDown);
-    document.addEventListener('touchstart', handlePointerDown);
+    document.addEventListener('touchstart', handlePointerDown, { passive: true });
     return () => {
       document.removeEventListener('mousedown', handlePointerDown);
       document.removeEventListener('touchstart', handlePointerDown);
     };
   }, [isMobileVolumeOpen]);
+
+  const queueMasterVolumeUpdate = useCallback((nextVolume: number) => {
+    if (Number.isNaN(nextVolume)) return;
+
+    pendingMasterVolumeRef.current = nextVolume;
+    if (masterVolumeRafRef.current !== null) return;
+
+    masterVolumeRafRef.current = requestAnimationFrame(() => {
+      masterVolumeRafRef.current = null;
+      setMasterVolume(pendingMasterVolumeRef.current);
+    });
+  }, [setMasterVolume]);
+
+  const handleMasterVolumeInput = useCallback((e: React.FormEvent<HTMLInputElement>) => {
+    queueMasterVolumeUpdate(parseFloat(e.currentTarget.value));
+  }, [queueMasterVolumeUpdate]);
+
+  const handleMasterVolumeChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    queueMasterVolumeUpdate(parseFloat(e.target.value));
+  }, [queueMasterVolumeUpdate]);
 
   const handleShare = useCallback((mixStr: string, id: string) => {
     const url = `${window.location.origin}/?mix=${mixStr}`;
@@ -181,9 +214,10 @@ export const TopNav = memo(function TopNav() {
                     max="1"
                     step="0.01"
                     value={masterVolume}
-                    onChange={(e) => setMasterVolume(parseFloat(e.target.value))}
+                    onInput={handleMasterVolumeInput}
+                    onChange={handleMasterVolumeChange}
                     aria-label="Master volume"
-                    className="w-full"
+                    className="w-full touch-pan-y"
                   />
                 </div>
               ) : null}
@@ -199,9 +233,10 @@ export const TopNav = memo(function TopNav() {
                 max="1"
                 step="0.01"
                 value={masterVolume}
-                onChange={(e) => setMasterVolume(parseFloat(e.target.value))}
+                onInput={handleMasterVolumeInput}
+                onChange={handleMasterVolumeChange}
                 aria-label="Master volume"
-                className="w-full"
+                className="w-full touch-pan-y"
               />
             </div>
             <button
