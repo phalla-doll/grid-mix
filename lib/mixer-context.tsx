@@ -81,7 +81,7 @@ const MixerContext = createContext<MixerContextType | undefined>(undefined);
 
 export function MixerProvider({ children }: { children: React.ReactNode }) {
   const [activeSounds, setActiveSounds] = useState<Record<string, number>>({});
-  const [masterVolume, setMasterVolumeState] = useState(0.5);
+  const [masterVolume, setMasterVolumeState] = useState(0.9);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
   const [savedMixes, setSavedMixes] = useState<SavedMix[]>([]);

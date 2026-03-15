@@ -1,7 +1,7 @@
 import { SoundDef } from './sounds';
 
 class AudioEngine {
-  private masterVolume = 0.5;
+  private masterVolume = 0.9;
   private activeNodes: Map<string, { audio: HTMLAudioElement; baseVolume: number; fadeFrame: number | null }> = new Map();
 
   init() {
