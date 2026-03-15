@@ -7,22 +7,24 @@ A beautiful ambient sound mixer for focus, relaxation, and sleep. Blend multiple
 ## Features
 
 ### Sound Library
+
 100+ ambient sounds across 10 categories:
 
-| Category | Description |
-|----------|-------------|
-| **Animals** | Bees, birds, cats, cows, crickets, dogs, frogs, horses, owls, seagulls, sheep, whales, wolves |
-| **Binaural** | Alpha, Beta, Delta, Gamma, Theta brainwave beats |
-| **Nature** | Campfire, droplets, jungle, river, waterfall, waves, wind |
-| **Noise** | Brown, Pink, White noise |
-| **Places** | Airport, cafe, carousel, church, construction, crowded bar, library, office, restaurant, subway, supermarket, temple |
-| **Rain** | Heavy, light, thunder, rain on car roof/leaves/tent/umbrella/window |
-| **Things** | Clock, keyboard, typewriter, washing machine, wind chimes, etc. |
-| **Transport** | Airplane, train, submarine, boat |
-| **Urban** | Ambulance, busy street, crowd, fireworks, highway, traffic |
-| **Misc** | Alarm, silence |
+| Category      | Description                                                                                                          |
+| ------------- | -------------------------------------------------------------------------------------------------------------------- |
+| **Animals**   | Bees, birds, cats, cows, crickets, dogs, frogs, horses, owls, seagulls, sheep, whales, wolves                        |
+| **Binaural**  | Alpha, Beta, Delta, Gamma, Theta brainwave beats                                                                     |
+| **Nature**    | Campfire, droplets, jungle, river, waterfall, waves, wind                                                            |
+| **Noise**     | Brown, Pink, White noise                                                                                             |
+| **Places**    | Airport, cafe, carousel, church, construction, crowded bar, library, office, restaurant, subway, supermarket, temple |
+| **Rain**      | Heavy, light, thunder, rain on car roof/leaves/tent/umbrella/window                                                  |
+| **Things**    | Clock, keyboard, typewriter, washing machine, wind chimes, etc.                                                      |
+| **Transport** | Airplane, train, submarine, boat                                                                                     |
+| **Urban**     | Ambulance, busy street, crowd, fireworks, highway, traffic                                                           |
+| **Misc**      | Alarm, silence                                                                                                       |
 
 ### Mixer Controls
+
 - **Toggle sounds** - Click any sound tile to activate/deactivate
 - **Volume control** - Adjust individual sound volumes (0-100%)
 - **Master play/pause** - Control all active sounds at once
@@ -30,12 +32,14 @@ A beautiful ambient sound mixer for focus, relaxation, and sleep. Blend multiple
 - **Category clear** - Clear all sounds in a specific category
 
 ### Presets & Sharing
+
 - **Save presets** - Store your favorite mixes with custom names
 - **Load presets** - Quick access to saved mixes
 - **URL sharing** - Share your mix via URL (mix parameter encoded in URL)
 - **Session persistence** - Your current mix is auto-saved to localStorage
 
 ### Media Integration
+
 - **Media Session API** - Control playback from browser media keys or notifications
 - **Now Playing** - Shows in system media controls
 
@@ -51,6 +55,7 @@ A beautiful ambient sound mixer for focus, relaxation, and sleep. Blend multiple
 ## Getting Started
 
 ### Prerequisites
+
 - Node.js 18+
 
 ### Installation
@@ -91,13 +96,13 @@ npm start
 
 ## Available Scripts
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start development server |
-| `npm run build` | Build for production |
-| `npm run start` | Start production server |
-| `npm run lint` | Run ESLint |
-| `npm run clean` | Clean Next.js cache |
+| Command         | Description              |
+| --------------- | ------------------------ |
+| `npm run dev`   | Start development server |
+| `npm run build` | Build for production     |
+| `npm run start` | Start production server  |
+| `npm run lint`  | Run ESLint               |
+| `npm run clean` | Clean Next.js cache      |
 
 ## Project Structure
 

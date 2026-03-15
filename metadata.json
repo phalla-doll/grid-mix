@@ -1,5 +1,5 @@
 {
-  "name": "Soro",
-  "description": "A developer-style minimalist ambient sound mixer with a sharp geometric UI.",
-  "requestFramePermissions": []
+    "name": "Soro",
+    "description": "A developer-style minimalist ambient sound mixer with a sharp geometric UI.",
+    "requestFramePermissions": []
 }
