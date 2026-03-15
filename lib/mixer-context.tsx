@@ -108,6 +108,48 @@ export function MixerProvider({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener('click', initAudio);
   }, []);
 
+  // Media Session API
+  useEffect(() => {
+    if ('mediaSession' in navigator) {
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: 'GridMix',
+        artist: 'Ambient Sound Generator',
+        artwork: [
+          { src: 'https://picsum.photos/seed/gridmix/512/512', sizes: '512x512', type: 'image/jpeg' }
+        ]
+      });
+
+      navigator.mediaSession.setActionHandler('play', () => {
+        setIsPlaying(true);
+        Object.entries(activeSounds).forEach(([id, vol]) => {
+          const soundDef = SOUNDS.find(s => s.id === id);
+          if (soundDef) {
+            engine.playSound(soundDef, vol);
+          }
+        });
+      });
+
+      navigator.mediaSession.setActionHandler('pause', () => {
+        setIsPlaying(false);
+        Object.keys(activeSounds).forEach(id => {
+          engine.stopSound(id);
+        });
+      });
+      
+      navigator.mediaSession.setActionHandler('stop', () => {
+        setActiveSounds({});
+        engine.stopAll();
+        setIsPlaying(false);
+      });
+    }
+  }, [activeSounds]);
+
+  useEffect(() => {
+    if ('mediaSession' in navigator) {
+      navigator.mediaSession.playbackState = isPlaying ? 'playing' : 'paused';
+    }
+  }, [isPlaying]);
+
   const toggleSound = useCallback((id: string) => {
     setActiveSounds(prev => {
       const next = { ...prev };

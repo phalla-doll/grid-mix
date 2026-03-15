@@ -23,12 +23,23 @@ export function SoundTile({ sound }: SoundTileProps) {
     setVolume(sound.id, parseFloat(e.target.value));
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === ' ' || e.key === 'Enter') {
+      e.preventDefault();
+      handleToggle();
+    }
+  };
+
   return (
     <div 
+      role="button"
+      tabIndex={0}
       onClick={handleToggle}
+      onKeyDown={handleKeyDown}
       className={`
         flex flex-col justify-between p-4 sm:p-6 h-[160px] transition-all duration-[120ms] ease-out
         border-b border-r border-[#222] group cursor-pointer
+        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white
         ${isActive 
           ? 'bg-[#1a1a1a]' 
           : 'bg-transparent hover:bg-[#111]'}
@@ -59,12 +70,14 @@ export function SoundTile({ sound }: SoundTileProps) {
         <div 
           className="flex items-center gap-2 sm:gap-4 mt-auto"
           onClick={(e) => e.stopPropagation()}
+          onKeyDown={(e) => e.stopPropagation()}
         >
           <button
             onClick={(e) => {
               e.stopPropagation();
               handleToggle();
             }}
+            tabIndex={-1}
             className="flex-shrink-0 flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 border transition-colors border-white bg-white text-black hover:bg-[#e0e0e0]"
           >
             <Square className="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-current" />
@@ -78,7 +91,8 @@ export function SoundTile({ sound }: SoundTileProps) {
               step="0.01"
               value={volume}
               onChange={handleVolumeChange}
-              className="w-full"
+              tabIndex={isActive ? 0 : -1}
+              className="w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
             />
           </div>
         </div>

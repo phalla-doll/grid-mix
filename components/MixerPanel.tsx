@@ -63,7 +63,7 @@ export function MixerPanel() {
         <div className="flex items-center gap-2 sm:gap-4 ml-4 sm:ml-6 flex-shrink-0">
           <button
             onClick={toggleMasterPlay}
-            className="flex items-center justify-center sm:justify-start gap-2 w-10 sm:w-auto sm:px-4 h-9 border border-[#444] bg-[#111] hover:bg-[#222] transition-colors text-sm font-medium text-white"
+            className="flex items-center justify-center sm:justify-start gap-2 w-10 sm:w-auto sm:px-4 h-9 border border-[#444] bg-[#111] hover:bg-[#222] transition-colors text-sm font-medium text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
           >
             {isPlaying ? (
               <>
@@ -80,7 +80,7 @@ export function MixerPanel() {
           
           <button
             onClick={handleOpenSave}
-            className="flex items-center justify-center sm:justify-start gap-2 w-10 sm:w-auto sm:px-4 h-9 border border-[#444] bg-[#111] hover:bg-[#222] transition-colors text-sm font-medium text-[#a1a1a1] hover:text-white"
+            className="flex items-center justify-center sm:justify-start gap-2 w-10 sm:w-auto sm:px-4 h-9 border border-[#444] bg-[#111] hover:bg-[#222] transition-colors text-sm font-medium text-[#a1a1a1] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
           >
             {isSaved ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Save className="w-3.5 h-3.5" />}
             <span className="hidden sm:inline">{isSaved ? 'Saved!' : 'Save'}</span>
@@ -88,7 +88,7 @@ export function MixerPanel() {
 
           <button
             onClick={stopAll}
-            className="flex items-center justify-center sm:justify-start gap-2 w-10 sm:w-auto sm:px-4 h-9 border border-[#444] bg-black hover:bg-[#111] transition-colors text-sm font-medium text-[#a1a1a1] hover:text-white"
+            className="flex items-center justify-center sm:justify-start gap-2 w-10 sm:w-auto sm:px-4 h-9 border border-[#444] bg-black hover:bg-[#111] transition-colors text-sm font-medium text-[#a1a1a1] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
           >
             <X className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Clear</span>
