@@ -1,10 +1,10 @@
 export const CATEGORY_ORDER = [
+  'nature',
+  'rain',
+  'places',
   'animals',
   'binaural',
-  'nature',
   'noise',
-  'places',
-  'rain',
   'things',
   'transport',
   'urban',
