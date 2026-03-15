@@ -129,11 +129,11 @@ export const SoundTile = memo(function SoundTile({ sound }: SoundTileProps) {
             <div className="flex justify-between items-start">
                 <div>
                     <div className="flex items-center gap-3">
-                        <h3
+                        <p
                             className={`text-sm font-medium ${isActive ? 'text-white' : 'text-[#e0e0e0]'}`}
                         >
                             {sound.name}
-                        </h3>
+                        </p>
                         {isActive && isPlaying && (
                             <Waveform isPlaying={isPlaying} />
                         )}

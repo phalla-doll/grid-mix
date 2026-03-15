@@ -58,10 +58,10 @@ export const SoundGrid = memo(function SoundGrid() {
                     >
                         <div className="h-12 border-b border-[#222] flex items-center justify-center">
                             <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 flex justify-between items-center">
-                                <span className="text-[10px] sm:text-[11px] font-mono text-[#888] tracking-widest uppercase">
+                                <h2 className="text-[10px] sm:text-[11px] font-mono text-[#888] tracking-widest uppercase">
                                     [{sectionNumber}]{' '}
                                     {formatCategoryLabel(category)}
-                                </span>
+                                </h2>
                                 {hasActiveSounds ? (
                                     <button
                                         type="button"

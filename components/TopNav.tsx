@@ -204,9 +204,9 @@ export const TopNav = memo(function TopNav() {
             <header className="h-14 border-b border-[#222] bg-grid-bg sticky top-0 z-50 flex items-center">
                 <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 flex items-center justify-between">
                     <div className="flex items-center gap-4 sm:gap-8">
-                        <h1 className="text-base sm:text-lg font-bold tracking-tight text-white uppercase">
+                        <div className="text-base sm:text-lg font-bold tracking-tight text-white uppercase">
                             Soro
-                        </h1>
+                        </div>
                     </div>
 
                     <div className="relative flex items-center gap-4 sm:gap-6">
