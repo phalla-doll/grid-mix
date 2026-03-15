@@ -1,34 +1,48 @@
 'use client';
 
-import React from 'react';
-import { SoundDef } from '@/lib/sounds';
+import React, { memo, useCallback, useRef, useEffect } from 'react';
+import { formatCategoryLabel, SoundDef } from '@/lib/sounds';
 import { useMixer } from '@/lib/mixer-context';
-import { Play, Square } from 'lucide-react';
+import { useGAEvent } from '@/hooks/useGAEvent';
+import { Square } from 'lucide-react';
+import { Waveform } from '@/components/Waveform';
 
 interface SoundTileProps {
   sound: SoundDef;
 }
 
-export function SoundTile({ sound }: SoundTileProps) {
+export const SoundTile = memo(function SoundTile({ sound }: SoundTileProps) {
   const { activeSounds, toggleSound, setVolume, isPlaying } = useMixer();
+  const { trackClick, trackChange } = useGAEvent();
+  const prevVolumeRef = useRef<number | null>(null);
   
   const isActive = activeSounds[sound.id] !== undefined;
   const volume = isActive ? activeSounds[sound.id] : 0.5;
 
-  const handleToggle = () => {
+  useEffect(() => {
+    if (prevVolumeRef.current !== null && prevVolumeRef.current !== volume && isActive) {
+      const volumePercent = Math.round(volume * 100);
+      trackChange('volume', `${sound.id}_volume`, volumePercent);
+    }
+    prevVolumeRef.current = volume;
+  }, [volume, isActive, sound.id, trackChange]);
+
+  const handleToggle = useCallback(() => {
+    const action = isActive ? 'sound_off' : 'sound_on';
+    trackClick('sound', action);
     toggleSound(sound.id);
-  };
+  }, [toggleSound, sound.id, isActive, trackClick]);
 
-  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleVolumeChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setVolume(sound.id, parseFloat(e.target.value));
-  };
+  }, [setVolume, sound.id]);
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === ' ' || e.key === 'Enter') {
       e.preventDefault();
       handleToggle();
     }
-  };
+  }, [handleToggle]);
 
   return (
     <div 
@@ -44,6 +58,8 @@ export function SoundTile({ sound }: SoundTileProps) {
           ? 'bg-[#1a1a1a]' 
           : 'bg-transparent hover:bg-[#111]'}
       `}
+      aria-pressed={isActive}
+      aria-label={`${sound.name}, ${formatCategoryLabel(sound.category)} sound${isActive ? ', active' : ''}`}
     >
       <div className="flex justify-between items-start">
         <div>
@@ -52,16 +68,11 @@ export function SoundTile({ sound }: SoundTileProps) {
               {sound.name}
             </h3>
             {isActive && isPlaying && (
-              <div className="flex gap-[2px] h-3 items-end opacity-50">
-                <div className="w-[2px] h-full bg-white origin-bottom animate-[waveform_1s_ease-in-out_infinite]" style={{ animationDelay: '0ms' }}></div>
-                <div className="w-[2px] h-full bg-white origin-bottom animate-[waveform_1.2s_ease-in-out_infinite]" style={{ animationDelay: '200ms' }}></div>
-                <div className="w-[2px] h-full bg-white origin-bottom animate-[waveform_0.8s_ease-in-out_infinite]" style={{ animationDelay: '400ms' }}></div>
-                <div className="w-[2px] h-full bg-white origin-bottom animate-[waveform_1.1s_ease-in-out_infinite]" style={{ animationDelay: '100ms' }}></div>
-              </div>
+              <Waveform isPlaying={isPlaying} />
             )}
           </div>
           <p className="text-[11px] text-[#888] uppercase tracking-wider mt-1 font-mono">
-            {sound.category}
+            {formatCategoryLabel(sound.category)}
           </p>
         </div>
       </div>
@@ -73,11 +84,14 @@ export function SoundTile({ sound }: SoundTileProps) {
           onKeyDown={(e) => e.stopPropagation()}
         >
           <button
+            type="button"
             onClick={(e) => {
               e.stopPropagation();
+              trackClick('sound', `${sound.id}_stop`);
               handleToggle();
             }}
             tabIndex={-1}
+            aria-label={`Stop ${sound.name}`}
             className="flex-shrink-0 flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 border transition-colors border-white bg-white text-black hover:bg-[#e0e0e0]"
           >
             <Square className="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-current" />
@@ -92,6 +106,10 @@ export function SoundTile({ sound }: SoundTileProps) {
               value={volume}
               onChange={handleVolumeChange}
               tabIndex={isActive ? 0 : -1}
+              aria-label={`${sound.name} volume`}
+              aria-valuenow={Math.round(volume * 100)}
+              aria-valuemin={0}
+              aria-valuemax={100}
               className="w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
             />
           </div>
@@ -99,4 +117,4 @@ export function SoundTile({ sound }: SoundTileProps) {
       )}
     </div>
   );
-}
+});

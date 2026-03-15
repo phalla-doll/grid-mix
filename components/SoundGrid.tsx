@@ -1,22 +1,32 @@
 'use client';
 
-import React from 'react';
-import { SOUNDS, SoundCategory } from '@/lib/sounds';
-import { SoundTile } from './SoundTile';
+import React, { memo, useMemo } from 'react';
+import { CATEGORY_ORDER, formatCategoryLabel, SOUNDS_BY_CATEGORY, SoundCategory } from '@/lib/sounds';
+import { SoundTile } from '@/components/SoundTile';
 import { useMixer } from '@/lib/mixer-context';
 import { X } from 'lucide-react';
 
-const CATEGORIES: SoundCategory[] = ['Nature', 'Urban', 'Noise', 'Synth'];
+const CATEGORIES: SoundCategory[] = CATEGORY_ORDER.filter((category) => category !== 'misc');
 
-export function SoundGrid() {
+export const SoundGrid = memo(function SoundGrid() {
   const { activeSounds, clearCategory } = useMixer();
+
+  const categoriesWithSounds = useMemo(() => {
+    return CATEGORIES.map((category) => {
+      const categorySounds = SOUNDS_BY_CATEGORY[category] || [];
+      const hasActiveSounds = categorySounds.some(s => activeSounds[s.id] !== undefined);
+      return { category, categorySounds, hasActiveSounds };
+    }).filter(c => c.categorySounds.length > 0);
+  }, [activeSounds]);
 
   return (
     <main className="flex-1 pb-12">
       <div className="w-full flex justify-center border-b border-[#222]">
         <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 py-16 sm:py-20 md:py-28">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-medium text-white mb-4 sm:mb-6 tracking-tight max-w-3xl">
-            Focus starts with the right sound.
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-medium text-white text-balance mb-4 sm:mb-6 tracking-tighter max-w-3xl">
+            Focus starts with the
+            <br className="hidden lg:block" />
+            right sound.
           </h1>
           <p className="text-[#888] text-base sm:text-lg md:text-xl max-w-2xl leading-relaxed">
             Mix nature, noise, and ambient environments to create your perfect space for work, rest, or sleep.
@@ -24,10 +34,7 @@ export function SoundGrid() {
         </div>
       </div>
 
-      {CATEGORIES.map((category, index) => {
-        const categorySounds = SOUNDS.filter(s => s.category === category);
-        if (categorySounds.length === 0) return null;
-
+      {categoriesWithSounds.map(({ category, categorySounds }, index) => {
         const hasActiveSounds = categorySounds.some(s => activeSounds[s.id] !== undefined);
         const sectionNumber = String(index + 1).padStart(2, '0');
 
@@ -36,11 +43,13 @@ export function SoundGrid() {
             <div className="h-12 border-b border-[#222] flex items-center justify-center">
               <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 flex justify-between items-center">
                 <span className="text-[10px] sm:text-[11px] font-mono text-[#888] tracking-widest uppercase">
-                  [{sectionNumber}] {category}
+                  [{sectionNumber}] {formatCategoryLabel(category)}
                 </span>
                 {hasActiveSounds ? (
                   <button 
+                    type="button"
                     onClick={() => clearCategory(category)}
+                    aria-label={`Clear ${formatCategoryLabel(category)} sounds`}
                     className="flex items-center gap-1.5 text-[10px] sm:text-[11px] font-mono text-[#888] hover:text-white transition-colors tracking-widest uppercase"
                   >
                     <X className="w-3 h-3" />
@@ -85,7 +94,7 @@ export function SoundGrid() {
       <div className="w-full flex justify-center border-b border-[#222] h-12 bg-[#0a0a0a]">
         <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 flex justify-between items-center">
           <span className="text-[10px] sm:text-[11px] font-mono text-[#555] tracking-widest uppercase">
-            Crafted by <a href="https://manthaa.dev/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Mantha</a>
+            Crafted by <a href="https://manthaa.dev/" target="_blank" rel="noopener noreferrer" className="text-white/50 hover:text-white transition-colors">Mantha</a>
           </span>
           <a 
             href="https://github.com/phalla-doll/grid-mix" 
@@ -99,4 +108,4 @@ export function SoundGrid() {
       </div>
     </main>
   );
-}
+});

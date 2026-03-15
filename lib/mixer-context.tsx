@@ -1,25 +1,53 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { SoundDef, SOUNDS } from './sounds';
+/* eslint-disable react-hooks/set-state-in-effect */
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef, useTransition } from 'react';
+import { SoundCategory, SoundDef, SOUNDS_BY_ID, getSoundsByCategory } from './sounds';
 import { engine } from './audio-engine';
 
 export const serializeMix = (sounds: Record<string, number>) => {
   return Object.entries(sounds)
-    .map(([id, vol]) => `${id}_${Math.round(vol * 100)}`)
-    .join('-');
+    .map(([id, vol]) => `${encodeURIComponent(id)}:${Math.round(vol * 100)}`)
+    .join(',');
 };
 
 export const deserializeMix = (mixStr: string): Record<string, number> => {
   const sounds: Record<string, number> = {};
   if (!mixStr) return sounds;
-  mixStr.split('-').forEach(part => {
-    const [id, volStr] = part.split('_');
-    const vol = parseInt(volStr, 10);
-    if (id && !isNaN(vol)) {
-      sounds[id] = vol / 100;
+
+  // New format: "<encodedId>:<vol>,<encodedId>:<vol>"
+  if (mixStr.includes(':')) {
+    mixStr.split(',').forEach((part) => {
+      const [encodedId, volStr] = part.split(':');
+      const vol = parseInt(volStr, 10);
+      if (encodedId && !Number.isNaN(vol)) {
+        try {
+          sounds[decodeURIComponent(encodedId)] = vol / 100;
+        } catch {
+          // Ignore malformed IDs.
+        }
+      }
+    });
+    return sounds;
+  }
+
+  // Legacy format: "<id>_<vol>-<id>_<vol>" (IDs may contain '-').
+  const segments = mixStr.split('-');
+  let chunk: string[] = [];
+  segments.forEach((segment) => {
+    chunk.push(segment);
+    const joined = chunk.join('-');
+    const match = joined.match(/^(.*)_([0-9]{1,3})$/);
+    if (match) {
+      const id = match[1];
+      const vol = parseInt(match[2], 10);
+      if (id && !Number.isNaN(vol)) {
+        sounds[id] = vol / 100;
+      }
+      chunk = [];
     }
   });
+
   return sounds;
 };
 
@@ -30,7 +58,7 @@ export interface SavedMix {
 }
 
 interface MixerState {
-  activeSounds: Record<string, number>; // id -> volume (0-1)
+  activeSounds: Record<string, number>;
   masterVolume: number;
   isPlaying: boolean;
   savedMixes: SavedMix[];
@@ -42,7 +70,7 @@ interface MixerContextType extends MixerState {
   setMasterVolume: (volume: number) => void;
   stopAll: () => void;
   pause: () => void;
-  clearCategory: (category: string) => void;
+  clearCategory: (category: SoundCategory) => void;
   toggleMasterPlay: () => void;
   saveMix: (name: string) => void;
   loadMix: (mixStr: string) => void;
@@ -57,18 +85,40 @@ export function MixerProvider({ children }: { children: React.ReactNode }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
   const [savedMixes, setSavedMixes] = useState<SavedMix[]>([]);
+  const [isPending, startTransition] = useTransition();
+  const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Load from URL or LocalStorage on mount
+  const normalizeActiveSounds = useCallback((sounds: Record<string, number>) => {
+    const normalized: Record<string, number> = {};
+    Object.entries(sounds).forEach(([id, volume]) => {
+      if (!SOUNDS_BY_ID[id]) return;
+      const safeVolume = Math.min(1, Math.max(0, volume));
+      normalized[id] = safeVolume;
+    });
+    return normalized;
+  }, []);
+
+  const playSoundById = useCallback((id: string, volume: number) => {
+    const soundDef = SOUNDS_BY_ID[id];
+    if (soundDef) {
+      engine.playSound(soundDef, volume);
+    }
+  }, []);
+
+  const stopSoundById = useCallback((id: string) => {
+    engine.stopSound(id);
+  }, []);
+
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const mixParam = params.get('mix');
     
     if (mixParam) {
-      setActiveSounds(deserializeMix(mixParam));
+      setActiveSounds(normalizeActiveSounds(deserializeMix(mixParam)));
     } else {
       const savedSession = localStorage.getItem('gridmix_current_session');
       if (savedSession) {
-        setActiveSounds(deserializeMix(savedSession));
+        setActiveSounds(normalizeActiveSounds(deserializeMix(savedSession)));
       }
     }
 
@@ -80,25 +130,37 @@ export function MixerProvider({ children }: { children: React.ReactNode }) {
     }
 
     setIsInitialized(true);
-  }, []);
+  }, [normalizeActiveSounds]);
 
-  // Save to URL and LocalStorage on change
   useEffect(() => {
     if (!isInitialized) return;
-    
-    const mixStr = serializeMix(activeSounds);
-    localStorage.setItem('gridmix_current_session', mixStr);
-    
-    const url = new URL(window.location.href);
-    if (mixStr) {
-      url.searchParams.set('mix', mixStr);
-    } else {
-      url.searchParams.delete('mix');
+
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
     }
-    window.history.replaceState({}, '', url.toString());
+
+    debounceRef.current = setTimeout(() => {
+      startTransition(() => {
+        const mixStr = serializeMix(activeSounds);
+        localStorage.setItem('gridmix_current_session', mixStr);
+        
+        const url = new URL(window.location.href);
+        if (mixStr) {
+          url.searchParams.set('mix', mixStr);
+        } else {
+          url.searchParams.delete('mix');
+        }
+        window.history.replaceState({}, '', url.toString());
+      });
+    }, 300);
+
+    return () => {
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current);
+      }
+    };
   }, [activeSounds, isInitialized]);
 
-  // Initialize audio engine on first interaction
   useEffect(() => {
     const initAudio = () => {
       engine.init();
@@ -108,7 +170,6 @@ export function MixerProvider({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener('click', initAudio);
   }, []);
 
-  // Media Session API
   useEffect(() => {
     if ('mediaSession' in navigator) {
       navigator.mediaSession.metadata = new MediaMetadata({
@@ -122,17 +183,14 @@ export function MixerProvider({ children }: { children: React.ReactNode }) {
       navigator.mediaSession.setActionHandler('play', () => {
         setIsPlaying(true);
         Object.entries(activeSounds).forEach(([id, vol]) => {
-          const soundDef = SOUNDS.find(s => s.id === id);
-          if (soundDef) {
-            engine.playSound(soundDef, vol);
-          }
+          playSoundById(id, vol);
         });
       });
 
       navigator.mediaSession.setActionHandler('pause', () => {
         setIsPlaying(false);
         Object.keys(activeSounds).forEach(id => {
-          engine.stopSound(id);
+          stopSoundById(id);
         });
       });
       
@@ -142,7 +200,7 @@ export function MixerProvider({ children }: { children: React.ReactNode }) {
         setIsPlaying(false);
       });
     }
-  }, [activeSounds]);
+  }, [activeSounds, playSoundById, stopSoundById]);
 
   useEffect(() => {
     if ('mediaSession' in navigator) {
@@ -157,27 +215,23 @@ export function MixerProvider({ children }: { children: React.ReactNode }) {
 
       if (next[id] !== undefined) {
         delete next[id];
-        engine.stopSound(id);
+        stopSoundById(id);
         
         if (Object.keys(next).length === 0) {
           setIsPlaying(false);
         }
       } else {
-        next[id] = 0.5; // Default volume
-        const soundDef = SOUNDS.find(s => s.id === id);
-        
+        next[id] = 0.5;
         if (isCurrentlyEmpty) {
           setIsPlaying(true);
-          if (soundDef) {
-            engine.playSound(soundDef, 0.5);
-          }
-        } else if (soundDef && isPlaying) {
-          engine.playSound(soundDef, 0.5);
+          playSoundById(id, 0.5);
+        } else if (isPlaying) {
+          playSoundById(id, 0.5);
         }
       }
       return next;
     });
-  }, [isPlaying]);
+  }, [isPlaying, playSoundById, stopSoundById]);
 
   const setVolume = useCallback((id: string, volume: number) => {
     setActiveSounds(prev => {
@@ -204,19 +258,20 @@ export function MixerProvider({ children }: { children: React.ReactNode }) {
   const pause = useCallback(() => {
     setIsPlaying(false);
     Object.keys(activeSounds).forEach(id => {
-      engine.stopSound(id);
+      stopSoundById(id);
     });
-  }, [activeSounds]);
+  }, [activeSounds, stopSoundById]);
 
-  const clearCategory = useCallback((category: string) => {
+  const clearCategory = useCallback((category: SoundCategory) => {
     setActiveSounds(prev => {
       const next = { ...prev };
-      const categorySoundIds = SOUNDS.filter(s => s.category === category).map(s => s.id);
+      const categorySounds = getSoundsByCategory(category);
+      const categorySoundIds = categorySounds.map((s: SoundDef) => s.id);
       
       categorySoundIds.forEach(id => {
         if (next[id] !== undefined) {
           delete next[id];
-          engine.stopSound(id);
+          stopSoundById(id);
         }
       });
       
@@ -226,28 +281,23 @@ export function MixerProvider({ children }: { children: React.ReactNode }) {
       
       return next;
     });
-  }, []);
+  }, [stopSoundById]);
 
   const toggleMasterPlay = useCallback(() => {
     setIsPlaying(prev => {
       const next = !prev;
       if (next) {
-        // Start all active sounds
         Object.entries(activeSounds).forEach(([id, vol]) => {
-          const soundDef = SOUNDS.find(s => s.id === id);
-          if (soundDef) {
-            engine.playSound(soundDef, vol);
-          }
+          playSoundById(id, vol);
         });
       } else {
-        // Stop all sounds but keep them in activeSounds state
         Object.keys(activeSounds).forEach(id => {
-          engine.stopSound(id);
+          stopSoundById(id);
         });
       }
       return next;
     });
-  }, [activeSounds]);
+  }, [activeSounds, playSoundById, stopSoundById]);
 
   const saveMix = useCallback((name: string) => {
     const mixStr = serializeMix(activeSounds);
@@ -260,17 +310,12 @@ export function MixerProvider({ children }: { children: React.ReactNode }) {
   }, [activeSounds]);
 
   const loadMix = useCallback((mixStr: string) => {
-    const sounds = deserializeMix(mixStr);
-    Object.keys(activeSounds).forEach(id => engine.stopSound(id));
+    const sounds = normalizeActiveSounds(deserializeMix(mixStr));
+    Object.keys(activeSounds).forEach(function(id) { stopSoundById(id); });
     setActiveSounds(sounds);
     setIsPlaying(true);
-    Object.entries(sounds).forEach(([id, vol]) => {
-      const soundDef = SOUNDS.find(s => s.id === id);
-      if (soundDef) {
-        engine.playSound(soundDef, vol);
-      }
-    });
-  }, [activeSounds]);
+    Object.entries(sounds).forEach(function([id, vol]) { playSoundById(id, vol); });
+  }, [activeSounds, normalizeActiveSounds, playSoundById, stopSoundById]);
 
   const deleteMix = useCallback((id: string) => {
     setSavedMixes(prev => {

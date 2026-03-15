@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+@theme inline {
+  --font-sans: var(--font-inter);
+}
+
 @theme {
   --color-grid-bg: #0a0a0a;
   --color-grid-panel: #111111;
@@ -52,4 +56,21 @@ input[type=range]:focus {
 
 input[type=range]:focus::-webkit-slider-runnable-track {
   background: var(--color-grid-border-hover);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .waveform-bar {
+    animation: none !important;
+    transform: scaleY(0.2) !important;
+  }
+  
+  input[type=range]::-webkit-slider-thumb {
+    transition: none !important;
+  }
 }

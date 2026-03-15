@@ -1,148 +1,112 @@
 import { SoundDef } from './sounds';
 
 class AudioEngine {
-  private ctx: AudioContext | null = null;
-  private masterGain: GainNode | null = null;
-  private activeNodes: Map<string, { source: AudioNode, gain: GainNode, lfo?: OscillatorNode }> = new Map();
+  private masterVolume = 0.5;
+  private activeNodes: Map<string, { audio: HTMLAudioElement; baseVolume: number; fadeFrame: number | null }> = new Map();
 
   init() {
-    if (!this.ctx) {
-      this.ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
-      this.masterGain = this.ctx.createGain();
-      this.masterGain.connect(this.ctx.destination);
-      this.masterGain.gain.value = 0.5; // Default master volume
-    }
+    // HTMLAudioElement does not require explicit initialization.
   }
 
   setMasterVolume(volume: number) {
-    if (this.masterGain) {
-      this.masterGain.gain.value = volume;
-    }
+    this.masterVolume = this.clamp(volume);
+    this.activeNodes.forEach((node) => {
+      this.applyVolume(node, node.baseVolume);
+    });
   }
 
   playSound(sound: SoundDef, volume: number) {
-    this.init();
-    if (!this.ctx || !this.masterGain) return;
-
+    const safeVolume = this.clamp(volume);
     if (this.activeNodes.has(sound.id)) {
       this.stopSound(sound.id);
     }
 
-    const gainNode = this.ctx.createGain();
-    gainNode.gain.setValueAtTime(0, this.ctx.currentTime);
-    gainNode.gain.linearRampToValueAtTime(volume, this.ctx.currentTime + 1.0); // 1s fade in
-    gainNode.connect(this.masterGain);
+    const audio = new Audio(sound.src);
+    audio.loop = sound.loop;
+    audio.preload = 'auto';
+    audio.volume = 0;
 
-    let source: AudioNode;
-    let lfo: OscillatorNode | undefined;
+    const node = { audio, baseVolume: safeVolume, fadeFrame: null };
+    this.activeNodes.set(sound.id, node);
 
-    if (sound.type === 'noise') {
-      const bufferSize = this.ctx.sampleRate * 2; // 2 seconds of noise
-      const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-      const data = buffer.getChannelData(0);
-
-      let lastOut = 0;
-      for (let i = 0; i < bufferSize; i++) {
-        const white = Math.random() * 2 - 1;
-        if (sound.noiseType === 'brown') {
-          data[i] = (lastOut + (0.02 * white)) / 1.02;
-          lastOut = data[i];
-          data[i] *= 3.5; // compensate gain
-        } else if (sound.noiseType === 'pink') {
-          // Simplistic pink noise approximation
-          data[i] = (lastOut * 0.99) + (white * 0.05);
-          lastOut = data[i];
-          data[i] *= 2;
-        } else {
-          data[i] = white;
-        }
-      }
-
-      const noiseSource = this.ctx.createBufferSource();
-      noiseSource.buffer = buffer;
-      noiseSource.loop = true;
-      source = noiseSource;
-    } else {
-      const osc = this.ctx.createOscillator();
-      osc.type = sound.oscType || 'sine';
-      osc.frequency.value = 100; // Base frequency
-      source = osc;
+    const playPromise = audio.play();
+    if (playPromise) {
+      playPromise.catch(() => {
+        this.activeNodes.delete(sound.id);
+      });
     }
 
-    let finalSource = source;
-
-    if (sound.filterType) {
-      const filter = this.ctx.createBiquadFilter();
-      filter.type = sound.filterType;
-      filter.frequency.value = sound.filterFreq || 1000;
-      
-      if (sound.lfoRate && sound.lfoDepth) {
-        lfo = this.ctx.createOscillator();
-        lfo.type = 'sine';
-        lfo.frequency.value = sound.lfoRate;
-        const lfoGain = this.ctx.createGain();
-        lfoGain.gain.value = sound.lfoDepth;
-        lfo.connect(lfoGain);
-        lfoGain.connect(filter.frequency);
-        lfo.start();
-      }
-
-      source.connect(filter);
-      filter.connect(gainNode);
-    } else {
-      source.connect(gainNode);
-    }
-
-    if (source instanceof AudioBufferSourceNode || source instanceof OscillatorNode) {
-      source.start();
-    }
-
-    this.activeNodes.set(sound.id, { source, gain: gainNode, lfo });
+    this.fadeVolume(node, 0, this.effectiveVolume(safeVolume), 1000);
   }
 
   setVolume(id: string, volume: number) {
     const node = this.activeNodes.get(id);
     if (node) {
-      // Smooth volume transition
-      if (this.ctx) {
-         node.gain.gain.cancelScheduledValues(this.ctx.currentTime);
-         node.gain.gain.setValueAtTime(node.gain.gain.value, this.ctx.currentTime);
-         node.gain.gain.linearRampToValueAtTime(volume, this.ctx.currentTime + 0.2);
-      } else {
-         node.gain.gain.value = volume;
-      }
+      node.baseVolume = this.clamp(volume);
+      this.fadeVolume(node, node.audio.volume, this.effectiveVolume(node.baseVolume), 200);
     }
   }
 
   stopSound(id: string) {
     const node = this.activeNodes.get(id);
-    if (node && this.ctx) {
-      const fadeOutTime = 1.0; // 1 second fade out
-      
-      node.gain.gain.cancelScheduledValues(this.ctx.currentTime);
-      node.gain.gain.setValueAtTime(node.gain.gain.value, this.ctx.currentTime);
-      node.gain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + fadeOutTime);
-
-      if (node.source instanceof AudioBufferSourceNode || node.source instanceof OscillatorNode) {
-        node.source.stop(this.ctx.currentTime + fadeOutTime);
-      }
-      if (node.lfo) {
-        node.lfo.stop(this.ctx.currentTime + fadeOutTime);
-      }
-      
+    if (node) {
       this.activeNodes.delete(id);
-      
-      setTimeout(() => {
-        try {
-          node.source.disconnect();
-          node.gain.disconnect();
-        } catch (e) {}
-      }, fadeOutTime * 1000 + 100);
+      this.fadeVolume(node, node.audio.volume, 0, 1000, () => {
+        node.audio.pause();
+        node.audio.currentTime = 0;
+      });
     }
   }
 
   stopAll() {
     this.activeNodes.forEach((_, id) => this.stopSound(id));
+  }
+
+  private clamp(value: number) {
+    if (value < 0) return 0;
+    if (value > 1) return 1;
+    return value;
+  }
+
+  private effectiveVolume(baseVolume: number) {
+    return this.clamp(baseVolume * this.masterVolume);
+  }
+
+  private applyVolume(
+    node: { audio: HTMLAudioElement; baseVolume: number; fadeFrame: number | null },
+    baseVolume: number
+  ) {
+    node.audio.volume = this.effectiveVolume(baseVolume);
+  }
+
+  private fadeVolume(
+    node: { audio: HTMLAudioElement; baseVolume: number; fadeFrame: number | null },
+    from: number,
+    to: number,
+    durationMs: number,
+    onDone?: () => void
+  ) {
+    if (node.fadeFrame !== null) {
+      cancelAnimationFrame(node.fadeFrame);
+      node.fadeFrame = null;
+    }
+
+    const start = performance.now();
+    const delta = to - from;
+
+    const step = (now: number) => {
+      const progress = Math.min(1, (now - start) / durationMs);
+      node.audio.volume = this.clamp(from + delta * progress);
+
+      if (progress < 1) {
+        node.fadeFrame = requestAnimationFrame(step);
+      } else {
+        node.fadeFrame = null;
+        onDone?.();
+      }
+    };
+
+    node.fadeFrame = requestAnimationFrame(step);
   }
 }
 
