@@ -10,6 +10,7 @@ const CATEGORIES: SoundCategory[] = CATEGORY_ORDER.filter((category) => category
 
 export const SoundGrid = memo(function SoundGrid() {
   const { activeSounds, clearCategory } = useMixer();
+  const hasActiveMix = Object.keys(activeSounds).length > 0;
 
   const categoriesWithSounds = useMemo(() => {
     return CATEGORIES.map((category) => {
@@ -107,11 +108,13 @@ export const SoundGrid = memo(function SoundGrid() {
         </div>
       </div>
 
-      {/* Spacer for fixed Active Mix panel */}
-      <div
-        aria-hidden="true"
-        className="w-full h-16 sm:h-20 bg-[#0a0a0a] border-b border-[#222] pointer-events-none"
-      />
+      {hasActiveMix ? (
+        /* Spacer for fixed Active Mix panel */
+        <div
+          aria-hidden="true"
+          className="w-full h-16 sm:h-20 bg-[#0a0a0a] border-b border-[#222] pointer-events-none"
+        />
+      ) : null}
     </main>
   );
 });
