@@ -135,15 +135,6 @@ export function MixerProvider({ children }: { children: React.ReactNode }) {
 
         if (mixParam) {
             setActiveSounds(normalizeActiveSounds(deserializeMix(mixParam)));
-        } else {
-            const savedSession = localStorage.getItem(
-                'gridmix_current_session'
-            );
-            if (savedSession) {
-                setActiveSounds(
-                    normalizeActiveSounds(deserializeMix(savedSession))
-                );
-            }
         }
 
         const savedPresets = localStorage.getItem('gridmix_saved_mixes');
@@ -166,7 +157,6 @@ export function MixerProvider({ children }: { children: React.ReactNode }) {
         debounceRef.current = setTimeout(() => {
             startTransition(() => {
                 const mixStr = serializeMix(activeSounds);
-                localStorage.setItem('gridmix_current_session', mixStr);
 
                 const url = new URL(window.location.href);
                 if (mixStr) {
