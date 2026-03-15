@@ -49,7 +49,7 @@ export function TopNav() {
       <header className="h-14 border-b border-[#222] bg-[#0a0a0a] sticky top-0 z-50 flex items-center">
         <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 flex items-center justify-between">
           <div className="flex items-center gap-4 sm:gap-8">
-            <h1 className="text-base sm:text-lg font-bold tracking-tight text-white uppercase">GridMix</h1>
+            <h1 className="text-base sm:text-lg font-bold tracking-tight text-white uppercase">Soro</h1>
           </div>
 
           <div className="flex items-center gap-4 sm:gap-6">

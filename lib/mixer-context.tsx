@@ -112,10 +112,10 @@ export function MixerProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if ('mediaSession' in navigator) {
       navigator.mediaSession.metadata = new MediaMetadata({
-        title: 'GridMix',
+        title: 'Soro',
         artist: 'Ambient Sound Generator',
         artwork: [
-          { src: 'https://picsum.photos/seed/gridmix/512/512', sizes: '512x512', type: 'image/jpeg' }
+          { src: '/icon/icon-512', sizes: '512x512', type: 'image/png' }
         ]
       });
 
