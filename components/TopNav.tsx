@@ -128,7 +128,7 @@ export const TopNav = memo(function TopNav() {
     useEffect(() => {
         if (prevVolumeRef.current !== masterVolume && volumeRef.current) {
             volumeRef.current.classList.add('scale-120', 'text-white');
-            volumeRef.current.classList.remove('text-[#a1a1a1]');
+            volumeRef.current.classList.remove('text-grid-text-secondary');
 
             const timer = setTimeout(() => {
                 if (volumeRef.current) {
@@ -136,7 +136,7 @@ export const TopNav = memo(function TopNav() {
                         'scale-120',
                         'text-white'
                     );
-                    volumeRef.current.classList.add('text-[#a1a1a1]');
+                    volumeRef.current.classList.add('text-grid-text-secondary');
                 }
             }, 150);
 
@@ -201,7 +201,7 @@ export const TopNav = memo(function TopNav() {
 
     return (
         <>
-            <header className="h-14 border-b border-[#222] bg-[#0a0a0a] sticky top-0 z-50 flex items-center">
+            <header className="h-14 border-b border-[#222] bg-grid-bg sticky top-0 z-50 flex items-center">
                 <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 flex items-center justify-between">
                     <div className="flex items-center gap-4 sm:gap-8">
                         <h1 className="text-base sm:text-lg font-bold tracking-tight text-white uppercase">
@@ -221,7 +221,7 @@ export const TopNav = memo(function TopNav() {
                                     ? `Edit timer, ${formatTime(timeRemaining)} remaining`
                                     : 'Set sleep timer'
                             }
-                            className={`flex items-center justify-center border border-[#444] bg-black hover:bg-[#111] transition-colors text-[#a1a1a1] hover:text-white ${
+                            className={`flex items-center justify-center border border-[#444] bg-black hover:bg-[#111] transition-colors text-grid-text-secondary hover:text-white ${
                                 timeRemaining !== null ? 'h-8 px-3' : 'w-8 h-8'
                             }`}
                         >
@@ -256,7 +256,7 @@ export const TopNav = memo(function TopNav() {
                                 className={`flex items-center justify-center w-8 h-8 border border-[#444] bg-black hover:bg-[#111] transition-colors ${
                                     isMobileVolumeOpen
                                         ? 'text-white'
-                                        : 'text-[#a1a1a1] hover:text-white'
+                                        : 'text-grid-text-secondary hover:text-white'
                                 }`}
                             >
                                 <Volume2 className="w-4 h-4" />
@@ -267,9 +267,9 @@ export const TopNav = memo(function TopNav() {
                                     id={mobileVolumePanelId}
                                     role="group"
                                     aria-label="Master volume"
-                                    className="absolute right-0 top-10 z-50 w-44 border border-[#333] bg-[#0a0a0a] p-2 flex items-center gap-2"
+                                    className="absolute right-0 top-10 z-50 w-44 border border-[#333] bg-grid-bg p-2 flex items-center gap-2"
                                 >
-                                    <Volume2 className="w-4 h-4 text-[#a1a1a1]" />
+                                    <Volume2 className="w-4 h-4 text-grid-text-secondary" />
                                     <label
                                         htmlFor="mobileMasterVolume"
                                         className="sr-only"
@@ -299,7 +299,7 @@ export const TopNav = memo(function TopNav() {
                         >
                             <div
                                 ref={volumeRef}
-                                className="text-[#a1a1a1] transition-all duration-150"
+                                className="text-grid-text-secondary transition-all duration-150"
                             >
                                 <Volume2 className="w-4 h-4" />
                             </div>
@@ -345,7 +345,7 @@ export const TopNav = memo(function TopNav() {
                                 setIsPresetsOpen(true);
                             }}
                             aria-label="Open saved presets"
-                            className="flex items-center justify-center w-8 h-8 border border-[#444] bg-black hover:bg-[#111] transition-colors text-[#a1a1a1] hover:text-white"
+                            className="flex items-center justify-center w-8 h-8 border border-[#444] bg-black hover:bg-[#111] transition-colors text-grid-text-secondary hover:text-white"
                         >
                             <Bookmark className="w-4 h-4" />
                         </button>
@@ -417,7 +417,7 @@ export const TopNav = memo(function TopNav() {
                                         trackClick('timer', 'timer_cancel');
                                         cancelTimer();
                                     }}
-                                    className="h-10 w-full border border-[#444] bg-black text-[#a1a1a1] hover:text-white hover:bg-[#111] transition-colors text-xs font-bold uppercase tracking-widest"
+                                    className="h-10 w-full border border-[#444] bg-black text-grid-text-secondary hover:text-white hover:bg-[#111] transition-colors text-xs font-bold uppercase tracking-widest"
                                 >
                                     Cancel Active Timer
                                 </button>
@@ -450,7 +450,7 @@ export const TopNav = memo(function TopNav() {
                                             <span className="text-sm font-medium text-[#e0e0e0] truncate pr-4">
                                                 {mix.name}
                                             </span>
-                                            <div className="flex items-center gap-2 flex-shrink-0">
+                                            <div className="flex items-center gap-2 shrink-0">
                                                 <button
                                                     type="button"
                                                     onClick={() => {

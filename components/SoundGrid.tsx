@@ -111,7 +111,7 @@ export const SoundGrid = memo(function SoundGrid() {
             </div>
 
             {/* Footer Row */}
-            <div className="w-full flex justify-center border-b border-[#222] h-12 bg-[#0a0a0a]">
+            <div className="w-full flex justify-center border-b border-[#222] h-12 bg-grid-bg">
                 <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 flex justify-between items-center">
                     <span className="text-[10px] sm:text-[11px] font-mono text-[#555] tracking-widest uppercase">
                         Crafted by{' '}
@@ -139,7 +139,7 @@ export const SoundGrid = memo(function SoundGrid() {
                 /* Spacer for fixed Active Mix panel */
                 <div
                     aria-hidden="true"
-                    className="w-full h-16 sm:h-20 bg-[#0a0a0a] border-b border-[#222] pointer-events-none"
+                    className="w-full h-16 sm:h-20 bg-grid-bg border-b border-[#222] pointer-events-none"
                 />
             ) : null}
         </main>

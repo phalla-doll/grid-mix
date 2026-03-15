@@ -51,7 +51,7 @@ export const DialogOverlay = memo(function DialogOverlay({
 
     return (
         <div
-            className={`fixed inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 ${className}`}
+            className={`fixed inset-0 z-200 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 ${className}`}
             onClick={() => onOpenChange(false)}
             onKeyDown={(e) => e.key === 'Escape' && onOpenChange(false)}
             role="dialog"
@@ -76,7 +76,7 @@ export const DialogContent = memo(function DialogContent({
 }: DialogContentProps) {
     return (
         <div
-            className={`w-full max-w-sm sm:max-w-md bg-[#0a0a0a] border border-[#222] shadow-2xl flex flex-col ${className}`}
+            className={`w-full max-w-sm sm:max-w-md bg-grid-bg border border-[#222] shadow-2xl flex flex-col ${className}`}
             onClick={(e) => {
                 e.stopPropagation();
                 onClick?.(e);

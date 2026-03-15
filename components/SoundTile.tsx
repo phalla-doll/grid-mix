@@ -118,7 +118,7 @@ export const SoundTile = memo(function SoundTile({ sound }: SoundTileProps) {
             onClick={() => handleToggle('tile')}
             onKeyDown={handleKeyDown}
             className={`
-        flex flex-col justify-between p-4 sm:p-6 h-[160px] transition-all duration-[120ms] ease-out
+        flex flex-col justify-between p-4 sm:p-6 h-[160px] transition-all duration-120 ease-out
         border-b border-r border-[#222] group cursor-pointer
         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white
         ${isActive ? 'bg-[#1a1a1a]' : 'bg-transparent hover:bg-[#111]'}
@@ -159,12 +159,12 @@ export const SoundTile = memo(function SoundTile({ sound }: SoundTileProps) {
                         }}
                         tabIndex={-1}
                         aria-label={`Stop ${sound.name}`}
-                        className="flex-shrink-0 flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 border transition-colors border-white bg-white text-black hover:bg-[#e0e0e0]"
+                        className="shrink-0 flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 border transition-colors border-white bg-white text-black hover:bg-[#e0e0e0]"
                     >
                         <Square className="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-current" />
                     </button>
 
-                    <div className="flex-grow transition-opacity duration-200 opacity-100">
+                    <div className="grow transition-opacity duration-200 opacity-100">
                         <input
                             type="range"
                             min="0"
