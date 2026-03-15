@@ -1,12 +1,8 @@
-<div align="center">
-<img width="1200" height="475" alt="Soro - Ambient Sound Mixer" src="https://github.com/phalla-doll/grid-mix/blob/main/public/sono-og-image-main.png" />
-</div>
+![Soro OG preview](https://github.com/phalla-doll/grid-mix/blob/main/public/sono-og-image-main.png)
 
 # Soro - Ambient Sound Mixer
 
 A beautiful ambient sound mixer for focus, relaxation, and sleep. Blend multiple nature sounds, white noise, urban ambiance, and binaural beats to create your perfect soundscape.
-
-[View Live App](https://github.com/phalla-doll/grid-mix/blob/main/public/sono-og-image-main.png) | [GitHub](https://github.com/phalla-doll/grid-mix)
 
 ## Features
 
