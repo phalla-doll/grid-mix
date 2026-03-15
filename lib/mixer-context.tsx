@@ -212,6 +212,10 @@ export function MixerProvider({ children }: { children: React.ReactNode }) {
     setActiveSounds(prev => {
       const next = { ...prev };
       const isCurrentlyEmpty = Object.keys(prev).length === 0;
+      const wasActive = next[id] !== undefined;
+      // #region agent log
+      fetch('http://127.0.0.1:7809/ingest/4769ac12-1ad9-49ed-87f7-dccecab75d3b',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'84f8a3'},body:JSON.stringify({sessionId:'84f8a3',runId:'run2',hypothesisId:'H7_H8',location:'lib/mixer-context.tsx:toggleSound',message:'Toggle reducer entered',data:{id,wasActive,isPlaying,isCurrentlyEmpty,activeCount:Object.keys(prev).length},timestamp:Date.now()})}).catch(()=>{});
+      // #endregion
 
       if (next[id] !== undefined) {
         delete next[id];
@@ -229,16 +233,30 @@ export function MixerProvider({ children }: { children: React.ReactNode }) {
           playSoundById(id, 0.5);
         }
       }
+      // #region agent log
+      fetch('http://127.0.0.1:7809/ingest/4769ac12-1ad9-49ed-87f7-dccecab75d3b',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'84f8a3'},body:JSON.stringify({sessionId:'84f8a3',runId:'run2',hypothesisId:'H7_H8',location:'lib/mixer-context.tsx:toggleSound',message:'Toggle reducer exiting',data:{id,nowActive:next[id]!==undefined,nextActiveCount:Object.keys(next).length},timestamp:Date.now()})}).catch(()=>{});
+      // #endregion
       return next;
     });
   }, [isPlaying, playSoundById, stopSoundById]);
 
   const setVolume = useCallback((id: string, volume: number) => {
     setActiveSounds(prev => {
-      if (prev[id] === undefined) return prev;
+      const soundExists = prev[id] !== undefined;
+      // #region agent log
+      fetch('http://127.0.0.1:7809/ingest/4769ac12-1ad9-49ed-87f7-dccecab75d3b',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'84f8a3'},body:JSON.stringify({sessionId:'84f8a3',runId:'run1',hypothesisId:'H2_H4',location:'lib/mixer-context.tsx:setVolume',message:'Mixer setVolume requested',data:{id,volume,isPlaying,soundExists},timestamp:Date.now()})}).catch(()=>{});
+      // #endregion
+      if (!soundExists) return prev;
       const next = { ...prev, [id]: volume };
       if (isPlaying) {
+        // #region agent log
+        fetch('http://127.0.0.1:7809/ingest/4769ac12-1ad9-49ed-87f7-dccecab75d3b',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'84f8a3'},body:JSON.stringify({sessionId:'84f8a3',runId:'run1',hypothesisId:'H2',location:'lib/mixer-context.tsx:setVolume',message:'Forwarding volume change to engine',data:{id,volume},timestamp:Date.now()})}).catch(()=>{});
+        // #endregion
         engine.setVolume(id, volume);
+      } else {
+        // #region agent log
+        fetch('http://127.0.0.1:7809/ingest/4769ac12-1ad9-49ed-87f7-dccecab75d3b',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'84f8a3'},body:JSON.stringify({sessionId:'84f8a3',runId:'run1',hypothesisId:'H2',location:'lib/mixer-context.tsx:setVolume',message:'Skipped engine.setVolume because isPlaying is false',data:{id,volume},timestamp:Date.now()})}).catch(()=>{});
+        // #endregion
       }
       return next;
     });
