@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useMixer } from '@/lib/mixer-context';
 import { Play, Square, Volume2, Timer as TimerIcon, X, Bookmark, Trash2 } from 'lucide-react';
+import { motion } from 'motion/react';
 
 export function TopNav() {
   const { isPlaying, toggleMasterPlay, masterVolume, setMasterVolume, pause, savedMixes, loadMix, deleteMix } = useMixer();
@@ -11,6 +12,13 @@ export function TopNav() {
   const [isPresetsOpen, setIsPresetsOpen] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
   const [customMinutes, setCustomMinutes] = useState<string>('30');
+  const [isVolumeChanging, setIsVolumeChanging] = useState(false);
+
+  useEffect(() => {
+    setIsVolumeChanging(true);
+    const timer = setTimeout(() => setIsVolumeChanging(false), 200);
+    return () => clearTimeout(timer);
+  }, [masterVolume]);
 
   useEffect(() => {
     if (timeRemaining === null) return;
@@ -68,7 +76,15 @@ export function TopNav() {
             </button>
 
             <div className="flex items-center gap-3 w-32 hidden sm:flex">
-              <Volume2 className="w-4 h-4 text-[#a1a1a1]" />
+              <motion.div
+                animate={{
+                  scale: isVolumeChanging ? 1.2 : 1,
+                  color: isVolumeChanging ? '#ffffff' : '#a1a1a1'
+                }}
+                transition={{ duration: 0.15 }}
+              >
+                <Volume2 className="w-4 h-4" />
+              </motion.div>
               <input
                 type="range"
                 min="0"
