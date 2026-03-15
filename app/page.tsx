@@ -1,4 +1,3 @@
-import React from 'react';
 import { MixerProvider } from '@/lib/mixer-context';
 import { ClientApp } from '@/components/ClientApp';
 
