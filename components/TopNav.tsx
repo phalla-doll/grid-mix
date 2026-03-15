@@ -13,16 +13,37 @@ export const TopNav = memo(function TopNav() {
   
   const [isTimerOpen, setIsTimerOpen] = useState(false);
   const [isPresetsOpen, setIsPresetsOpen] = useState(false);
+  const [isMobileVolumeOpen, setIsMobileVolumeOpen] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
   const [customMinutes, setCustomMinutes] = useState<string>('30');
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const volumeRef = useRef<HTMLDivElement>(null);
+  const mobileVolumeRef = useRef<HTMLDivElement>(null);
   const prevVolumeRef = useRef(masterVolume);
   const pauseFnRef = useRef(pause);
+  const mobileVolumePanelId = 'mobile-master-volume-panel';
   
   useEffect(() => {
     pauseFnRef.current = pause;
   }, [pause]);
+
+  useEffect(() => {
+    if (!isMobileVolumeOpen) return;
+
+    const handlePointerDown = (event: MouseEvent | TouchEvent) => {
+      if (!mobileVolumeRef.current) return;
+      if (!mobileVolumeRef.current.contains(event.target as Node)) {
+        setIsMobileVolumeOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handlePointerDown);
+    document.addEventListener('touchstart', handlePointerDown);
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown);
+      document.removeEventListener('touchstart', handlePointerDown);
+    };
+  }, [isMobileVolumeOpen]);
 
   const handleShare = useCallback((mixStr: string, id: string) => {
     const url = `${window.location.origin}/?mix=${mixStr}`;
@@ -107,7 +128,7 @@ export const TopNav = memo(function TopNav() {
             <h1 className="text-base sm:text-lg font-bold tracking-tight text-white uppercase">Soro</h1>
           </div>
 
-          <div className="flex items-center gap-4 sm:gap-6">
+          <div className="relative flex items-center gap-4 sm:gap-6">
             <button
               type="button"
               onClick={() => {
@@ -126,7 +147,49 @@ export const TopNav = memo(function TopNav() {
               )}
             </button>
 
-            <div className="flex items-center gap-3 w-32 hidden sm:flex" role="group" aria-label="Master volume">
+            <div ref={mobileVolumeRef} className="relative sm:hidden">
+              <button
+                type="button"
+                onClick={() => {
+                  const nextOpen = !isMobileVolumeOpen;
+                  trackClick('volume', nextOpen ? 'open_mobile_volume' : 'close_mobile_volume');
+                  setIsMobileVolumeOpen(nextOpen);
+                }}
+                aria-label="Adjust master volume"
+                aria-expanded={isMobileVolumeOpen}
+                aria-controls={mobileVolumePanelId}
+                className={`flex items-center justify-center w-8 h-8 border border-[#444] bg-black hover:bg-[#111] transition-colors ${
+                  isMobileVolumeOpen ? 'text-white' : 'text-[#a1a1a1] hover:text-white'
+                }`}
+              >
+                <Volume2 className="w-4 h-4" />
+              </button>
+
+              {isMobileVolumeOpen ? (
+                <div
+                  id={mobileVolumePanelId}
+                  role="group"
+                  aria-label="Master volume"
+                  className="absolute right-0 top-10 z-50 w-44 border border-[#333] bg-[#0a0a0a] p-2 flex items-center gap-2"
+                >
+                  <Volume2 className="w-4 h-4 text-[#a1a1a1]" />
+                  <label htmlFor="mobileMasterVolume" className="sr-only">Master volume</label>
+                  <input
+                    id="mobileMasterVolume"
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.01"
+                    value={masterVolume}
+                    onChange={(e) => setMasterVolume(parseFloat(e.target.value))}
+                    aria-label="Master volume"
+                    className="w-full"
+                  />
+                </div>
+              ) : null}
+            </div>
+
+            <div className="hidden items-center gap-3 w-32 sm:flex" role="group" aria-label="Master volume">
               <div ref={volumeRef} className="text-[#a1a1a1] transition-all duration-150">
                 <Volume2 className="w-4 h-4" />
               </div>
