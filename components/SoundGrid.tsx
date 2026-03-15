@@ -85,7 +85,7 @@ export function SoundGrid() {
       <div className="w-full flex justify-center border-b border-[#222] h-12 bg-[#0a0a0a]">
         <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 flex justify-between items-center">
           <span className="text-[10px] sm:text-[11px] font-mono text-[#555] tracking-widest uppercase">
-            Crafted by Mantha
+            Crafted by <a href="https://manthaa.dev/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Mantha</a>
           </span>
           <a 
             href="https://github.com/phalla-doll/grid-mix" 
