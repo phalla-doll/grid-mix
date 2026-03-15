@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useMixer } from '@/lib/mixer-context';
-import { Play, Square, Volume2, Timer as TimerIcon, X, Bookmark, Trash2 } from 'lucide-react';
+import { Play, Square, Volume2, Timer as TimerIcon, X, Bookmark, Trash2, Share2, Check } from 'lucide-react';
 import { motion } from 'motion/react';
 
 export function TopNav() {
@@ -13,6 +13,14 @@ export function TopNav() {
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
   const [customMinutes, setCustomMinutes] = useState<string>('30');
   const [isVolumeChanging, setIsVolumeChanging] = useState(false);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  const handleShare = (mixStr: string, id: string) => {
+    const url = `${window.location.origin}/?mix=${mixStr}`;
+    navigator.clipboard.writeText(url);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
 
   useEffect(() => {
     setIsVolumeChanging(true);
@@ -206,6 +214,13 @@ export function TopNav() {
                         >
                           <Play className="w-3 h-3 fill-current" />
                           Play
+                        </button>
+                        <button
+                          onClick={() => handleShare(mix.mixStr, mix.id)}
+                          className="flex items-center justify-center w-8 h-8 border border-[#444] bg-black text-[#888] hover:text-white hover:border-[#888] transition-colors"
+                          title="Share Preset"
+                        >
+                          {copiedId === mix.id ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Share2 className="w-3.5 h-3.5" />}
                         </button>
                         <button
                           onClick={() => deleteMix(mix.id)}
