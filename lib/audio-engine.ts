@@ -85,37 +85,6 @@ class AudioEngine {
         };
         this.activeNodes.set(sound.id, node);
         this.trackedNodes.add(node);
-        // #region agent log
-        fetch(
-            'http://127.0.0.1:7809/ingest/4769ac12-1ad9-49ed-87f7-dccecab75d3b',
-            {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Debug-Session-Id': '84f8a3',
-                },
-                body: JSON.stringify({
-                    sessionId: '84f8a3',
-                    runId: 'run1',
-                    hypothesisId: 'H1_H4',
-                    location: 'lib/audio-engine.ts:playSound',
-                    message: 'Created audio node for sound',
-                    data: {
-                        soundId: sound.id,
-                        safeVolume,
-                        masterVolume: this.masterVolume,
-                        effectiveVolume: this.effectiveVolume(safeVolume),
-                        initialAudioVolume: audio.volume,
-                        userAgent:
-                            typeof navigator !== 'undefined'
-                                ? navigator.userAgent
-                                : 'unknown',
-                    },
-                    timestamp: Date.now(),
-                }),
-            }
-        ).catch(() => {});
-        // #endregion
 
         const playPromise = audio.play();
         if (playPromise) {
@@ -131,33 +100,6 @@ class AudioEngine {
 
     setVolume(id: string, volume: number) {
         const node = this.activeNodes.get(id);
-        // #region agent log
-        fetch(
-            'http://127.0.0.1:7809/ingest/4769ac12-1ad9-49ed-87f7-dccecab75d3b',
-            {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Debug-Session-Id': '84f8a3',
-                },
-                body: JSON.stringify({
-                    sessionId: '84f8a3',
-                    runId: 'run1',
-                    hypothesisId: 'H1_H4_H5',
-                    location: 'lib/audio-engine.ts:setVolume',
-                    message: 'Audio engine setVolume called',
-                    data: {
-                        id,
-                        requestedVolume: volume,
-                        hasNode: !!node,
-                        currentAudioVolume: node ? node.audio.volume : null,
-                        masterVolume: this.masterVolume,
-                    },
-                    timestamp: Date.now(),
-                }),
-            }
-        ).catch(() => {});
-        // #endregion
         if (node) {
             node.baseVolume = this.clamp(volume);
             this.fadeVolume(
@@ -171,32 +113,6 @@ class AudioEngine {
 
     stopSound(id: string) {
         const node = this.activeNodes.get(id);
-        // #region agent log
-        fetch(
-            'http://127.0.0.1:7809/ingest/4769ac12-1ad9-49ed-87f7-dccecab75d3b',
-            {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Debug-Session-Id': '84f8a3',
-                },
-                body: JSON.stringify({
-                    sessionId: '84f8a3',
-                    runId: 'run2',
-                    hypothesisId: 'H8_H9',
-                    location: 'lib/audio-engine.ts:stopSound',
-                    message: 'Stop requested',
-                    data: {
-                        id,
-                        hasNode: !!node,
-                        currentAudioVolume: node ? node.audio.volume : null,
-                        activeNodeCount: this.activeNodes.size,
-                    },
-                    timestamp: Date.now(),
-                }),
-            }
-        ).catch(() => {});
-        // #endregion
         if (node) {
             this.activeNodes.delete(id);
             const fallbackStop = setTimeout(() => {
@@ -212,32 +128,6 @@ class AudioEngine {
                     clearTimeout(fallbackStop);
                     this.hardStopNode(node);
                     this.trackedNodes.delete(node);
-                    // #region agent log
-                    fetch(
-                        'http://127.0.0.1:7809/ingest/4769ac12-1ad9-49ed-87f7-dccecab75d3b',
-                        {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-Debug-Session-Id': '84f8a3',
-                            },
-                            body: JSON.stringify({
-                                sessionId: '84f8a3',
-                                runId: 'run2',
-                                hypothesisId: 'H9',
-                                location: 'lib/audio-engine.ts:stopSound',
-                                message: 'Stop fade completed and audio paused',
-                                data: {
-                                    id,
-                                    currentTime: node.audio.currentTime,
-                                    paused: node.audio.paused,
-                                    remainingActiveNodes: this.activeNodes.size,
-                                },
-                                timestamp: Date.now(),
-                            }),
-                        }
-                    ).catch(() => {});
-                    // #endregion
                 }
             );
         }
@@ -310,34 +200,6 @@ class AudioEngine {
                 node.fadeFrame = requestAnimationFrame(step);
             } else {
                 node.fadeFrame = null;
-                // #region agent log
-                fetch(
-                    'http://127.0.0.1:7809/ingest/4769ac12-1ad9-49ed-87f7-dccecab75d3b',
-                    {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-Debug-Session-Id': '84f8a3',
-                        },
-                        body: JSON.stringify({
-                            sessionId: '84f8a3',
-                            runId: 'run1',
-                            hypothesisId: 'H1_H5',
-                            location: 'lib/audio-engine.ts:fadeVolume',
-                            message: 'Fade completed',
-                            data: {
-                                from,
-                                to,
-                                durationMs,
-                                finalAudioVolume: node.audio.volume,
-                                baseVolume: node.baseVolume,
-                                masterVolume: this.masterVolume,
-                            },
-                            timestamp: Date.now(),
-                        }),
-                    }
-                ).catch(() => {});
-                // #endregion
                 onDone?.();
             }
         };

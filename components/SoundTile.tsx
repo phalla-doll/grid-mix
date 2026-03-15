@@ -34,71 +34,18 @@ export const SoundTile = memo(function SoundTile({ sound }: SoundTileProps) {
     const handleToggle = useCallback(
         (source: 'tile' | 'stop_button' | 'keyboard') => {
             const action = isActive ? 'sound_off' : 'sound_on';
-            // #region agent log
-            fetch(
-                'http://127.0.0.1:7809/ingest/4769ac12-1ad9-49ed-87f7-dccecab75d3b',
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Debug-Session-Id': '84f8a3',
-                    },
-                    body: JSON.stringify({
-                        sessionId: '84f8a3',
-                        runId: 'run2',
-                        hypothesisId: 'H7_H8',
-                        location: 'components/SoundTile.tsx:handleToggle',
-                        message: 'Sound toggle requested from UI',
-                        data: {
-                            soundId: sound.id,
-                            source,
-                            action,
-                            isActive,
-                            isPlaying,
-                        },
-                        timestamp: Date.now(),
-                    }),
-                }
-            ).catch(() => {});
-            // #endregion
             trackClick('sound', action);
             toggleSound(sound.id);
         },
-        [isActive, isPlaying, toggleSound, sound.id, trackClick]
+        [isActive, toggleSound, sound.id, trackClick]
     );
 
     const handleVolumeChange = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
             const nextVolume = parseFloat(e.target.value);
-            // #region agent log
-            fetch(
-                'http://127.0.0.1:7809/ingest/4769ac12-1ad9-49ed-87f7-dccecab75d3b',
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Debug-Session-Id': '84f8a3',
-                    },
-                    body: JSON.stringify({
-                        sessionId: '84f8a3',
-                        runId: 'run1',
-                        hypothesisId: 'H2_H3',
-                        location: 'components/SoundTile.tsx:handleVolumeChange',
-                        message: 'Individual slider changed',
-                        data: {
-                            soundId: sound.id,
-                            nextVolume,
-                            isActive,
-                            isPlaying,
-                        },
-                        timestamp: Date.now(),
-                    }),
-                }
-            ).catch(() => {});
-            // #endregion
             setVolume(sound.id, nextVolume);
         },
-        [isActive, isPlaying, setVolume, sound.id]
+        [setVolume, sound.id]
     );
 
     const handleKeyDown = useCallback(
