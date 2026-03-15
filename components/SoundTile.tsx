@@ -53,10 +53,10 @@ export function SoundTile({ sound }: SoundTileProps) {
             </h3>
             {isActive && isPlaying && (
               <div className="flex gap-[2px] h-3 items-end opacity-50">
-                <div className="w-[1px] bg-white animate-[pulse_1s_ease-in-out_infinite]" style={{ height: '40%' }}></div>
-                <div className="w-[1px] bg-white animate-[pulse_1.2s_ease-in-out_infinite_0.2s]" style={{ height: '100%' }}></div>
-                <div className="w-[1px] bg-white animate-[pulse_0.8s_ease-in-out_infinite_0.4s]" style={{ height: '60%' }}></div>
-                <div className="w-[1px] bg-white animate-[pulse_1.1s_ease-in-out_infinite_0.1s]" style={{ height: '80%' }}></div>
+                <div className="w-[2px] h-full bg-white origin-bottom animate-[waveform_1s_ease-in-out_infinite]" style={{ animationDelay: '0ms' }}></div>
+                <div className="w-[2px] h-full bg-white origin-bottom animate-[waveform_1.2s_ease-in-out_infinite]" style={{ animationDelay: '200ms' }}></div>
+                <div className="w-[2px] h-full bg-white origin-bottom animate-[waveform_0.8s_ease-in-out_infinite]" style={{ animationDelay: '400ms' }}></div>
+                <div className="w-[2px] h-full bg-white origin-bottom animate-[waveform_1.1s_ease-in-out_infinite]" style={{ animationDelay: '100ms' }}></div>
               </div>
             )}
           </div>

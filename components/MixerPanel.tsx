@@ -46,7 +46,13 @@ export function MixerPanel() {
             {displayIds.map(id => {
               const sound = SOUNDS.find(s => s.id === id);
               return (
-                <div key={id} className="flex items-center gap-2 px-3 py-1.5 bg-[#111] border border-[#333] text-xs font-medium text-[#e0e0e0] max-w-[140px]">
+                <div key={id} className="flex items-center gap-2 px-3 py-1.5 bg-[#111] border border-[#333] text-xs font-medium text-[#e0e0e0] max-w-[160px]">
+                  <div className="flex gap-[2px] h-3 items-end flex-shrink-0 opacity-70">
+                    <div className={`w-[2px] h-full bg-white origin-bottom ${isPlaying ? 'animate-[waveform_1s_ease-in-out_infinite]' : 'scale-y-20 transition-transform duration-300'}`} style={{ animationDelay: '0ms' }}></div>
+                    <div className={`w-[2px] h-full bg-white origin-bottom ${isPlaying ? 'animate-[waveform_1.2s_ease-in-out_infinite]' : 'scale-y-20 transition-transform duration-300'}`} style={{ animationDelay: '200ms' }}></div>
+                    <div className={`w-[2px] h-full bg-white origin-bottom ${isPlaying ? 'animate-[waveform_0.8s_ease-in-out_infinite]' : 'scale-y-20 transition-transform duration-300'}`} style={{ animationDelay: '400ms' }}></div>
+                    <div className={`w-[2px] h-full bg-white origin-bottom ${isPlaying ? 'animate-[waveform_1.1s_ease-in-out_infinite]' : 'scale-y-20 transition-transform duration-300'}`} style={{ animationDelay: '100ms' }}></div>
+                  </div>
                   <span className="truncate">{sound?.name}</span>
                   <span className="text-[#888] font-mono flex-shrink-0">{(activeSounds[id] * 100).toFixed(0)}%</span>
                 </div>

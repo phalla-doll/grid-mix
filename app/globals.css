@@ -12,6 +12,11 @@
   --color-grid-border-hover: #555555;
 }
 
+@keyframes waveform {
+  0%, 100% { transform: scaleY(0.2); }
+  50% { transform: scaleY(1); }
+}
+
 body {
   background-color: var(--color-grid-bg);
   color: var(--color-grid-text-primary);
