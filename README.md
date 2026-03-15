@@ -66,14 +66,9 @@ npm install
 
 ### Configuration
 
-Create a `.env.local` file (optional - not required for basic usage):
+Create a `.env.local` file only if you need to override environment settings.
 
-```bash
-# Optional: Gemini API key for AI features
-GEMINI_API_KEY=your_gemini_api_key_here
-```
-
-See `.env.example` for all available environment variables.
+See `.env.example` for available environment variables.
 
 ### Development
 
