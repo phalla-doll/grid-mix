@@ -15,8 +15,8 @@ import {
     SoundDef,
     SOUNDS_BY_ID,
     getSoundsByCategory,
-} from './sounds';
-import { engine } from './audio-engine';
+} from '@/lib/sounds';
+import { engine } from '@/lib/audio-engine';
 
 export const serializeMix = (sounds: Record<string, number>) => {
     return Object.entries(sounds)
@@ -188,7 +188,7 @@ export function MixerProvider({ children }: { children: React.ReactNode }) {
         if ('mediaSession' in navigator) {
             navigator.mediaSession.metadata = new MediaMetadata({
                 title: 'Soro',
-                artist: 'Ambient Sound Generator',
+                artist: 'Ambient Sound Mixer',
                 artwork: [
                     {
                         src: '/icon/icon-512',

@@ -1,4 +1,4 @@
-import { SoundDef } from './sounds';
+import { SoundDef } from '@/lib/sounds';
 
 interface ActiveNode {
     audio: HTMLAudioElement;
