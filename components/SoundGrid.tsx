@@ -113,13 +113,13 @@ export const SoundGrid = memo(function SoundGrid() {
             {/* Footer Row */}
             <div className="w-full flex justify-center border-b border-[#222] h-12 bg-grid-bg">
                 <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 flex justify-between items-center">
-                    <span className="text-[10px] sm:text-[11px] font-mono text-[#555] tracking-widest uppercase">
+                    <span className="text-[10px] sm:text-[11px] font-mono text-[#888] tracking-widest uppercase">
                         Crafted by{' '}
                         <a
                             href="https://manthaa.dev/"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-white/50 hover:text-white transition-colors"
+                            className="text-[#e0e0e0] transition-colors"
                         >
                             Mantha
                         </a>
@@ -128,7 +128,7 @@ export const SoundGrid = memo(function SoundGrid() {
                         href="https://github.com/phalla-doll/grid-mix"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[10px] sm:text-[11px] font-mono text-[#555] hover:text-white transition-colors tracking-widest uppercase"
+                        className="text-[10px] sm:text-[11px] font-mono text-[#e0e0e0] transition-colors tracking-widest uppercase"
                     >
                         / GITHUB
                     </a>
