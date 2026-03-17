@@ -1,8 +1,8 @@
-import { Inter } from 'next/font/google';
+import { Geist } from 'next/font/google';
 
-export const inter = Inter({
+export const geist = Geist({
     subsets: ['latin'],
     display: 'swap',
-    variable: '--font-inter',
+    variable: '--font-geist',
     fallback: ['system-ui', 'arial'],
 });

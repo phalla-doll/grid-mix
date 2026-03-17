@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { GoogleAnalytics } from '@next/third-parties/google';
-import { inter } from './fonts';
+import { geist } from './fonts';
 import './globals.css'; // Global styles
 
 export const metadata: Metadata = {
@@ -36,7 +36,7 @@ export default function RootLayout({
     children: React.ReactNode;
 }) {
     return (
-        <html lang="en" className={`${inter.variable} font-sans`}>
+        <html lang="en" className={`${geist.variable} font-sans`}>
             <body suppressHydrationWarning className="antialiased">
                 {children}
             </body>
