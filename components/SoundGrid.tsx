@@ -36,6 +36,7 @@ export const SoundGrid = memo(function SoundGrid() {
                     <h1 className="text-3xl sm:text-4xl md:text-5xl font-medium text-white text-balance mb-4 sm:mb-6 tracking-tighter max-w-3xl">
                         Focus starts with the
                         <br className="hidden lg:block" />
+                        <span className="lg:hidden">&nbsp;</span>
                         right sound.
                     </h1>
                     <p className="text-[#888] text-base sm:text-lg md:text-xl max-w-2xl leading-relaxed">
