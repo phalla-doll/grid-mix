@@ -4,7 +4,8 @@ import React, { memo, useCallback, useRef, useEffect } from 'react';
 import { formatCategoryLabel, SoundDef } from '@/lib/sounds';
 import { useMixer } from '@/lib/mixer-context';
 import { useGAEvent } from '@/hooks/useGAEvent';
-import { Square } from 'lucide-react';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { StopIcon } from '@hugeicons/core-free-icons';
 import { Waveform } from '@/components/Waveform';
 
 interface SoundTileProps {
@@ -108,7 +109,10 @@ export const SoundTile = memo(function SoundTile({ sound }: SoundTileProps) {
                         aria-label={`Stop ${sound.name}`}
                         className="shrink-0 flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 border transition-colors border-white bg-white text-black hover:bg-[#e0e0e0]"
                     >
-                        <Square className="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-current" />
+                        <HugeiconsIcon
+                            icon={StopIcon}
+                            className="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-current"
+                        />
                     </button>
 
                     <div className="grow transition-opacity duration-200 opacity-100">

@@ -3,16 +3,17 @@
 import React, { useState, useEffect, useCallback, memo, useRef } from 'react';
 import { useMixer } from '@/lib/mixer-context';
 import { useGAEvent } from '@/hooks/useGAEvent';
+import { HugeiconsIcon } from '@hugeicons/react';
 import {
-    Play,
-    Square,
-    Volume2,
-    Timer as TimerIcon,
-    Bookmark,
-    Trash2,
-    Share2,
-    Check,
-} from 'lucide-react';
+    PlayIcon,
+    StopIcon,
+    VolumeHighIcon,
+    TimerIcon as TimerSvgIcon,
+    BookmarkIcon,
+    Delete02Icon,
+    ShareIcon,
+    TickIcon,
+} from '@hugeicons/core-free-icons';
 import {
     Dialog,
     DialogOverlay,
@@ -230,7 +231,10 @@ export const TopNav = memo(function TopNav() {
                                     {formatTime(timeRemaining)}
                                 </span>
                             ) : (
-                                <TimerIcon className="w-4 h-4" />
+                                <HugeiconsIcon
+                                    icon={TimerSvgIcon}
+                                    className="w-4 h-4"
+                                />
                             )}
                         </button>
 
@@ -259,7 +263,10 @@ export const TopNav = memo(function TopNav() {
                                         : 'text-grid-text-secondary hover:text-white'
                                 }`}
                             >
-                                <Volume2 className="w-4 h-4" />
+                                <HugeiconsIcon
+                                    icon={VolumeHighIcon}
+                                    className="w-4 h-4"
+                                />
                             </button>
 
                             {isMobileVolumeOpen ? (
@@ -269,7 +276,10 @@ export const TopNav = memo(function TopNav() {
                                     aria-label="Master volume"
                                     className="absolute right-0 top-10 z-50 w-44 border border-[#333] bg-grid-bg p-2 flex items-center gap-2"
                                 >
-                                    <Volume2 className="w-4 h-4 text-grid-text-secondary" />
+                                    <HugeiconsIcon
+                                        icon={VolumeHighIcon}
+                                        className="w-4 h-4 text-grid-text-secondary"
+                                    />
                                     <label
                                         htmlFor="mobileMasterVolume"
                                         className="sr-only"
@@ -301,7 +311,10 @@ export const TopNav = memo(function TopNav() {
                                 ref={volumeRef}
                                 className="text-grid-text-secondary transition-all duration-150"
                             >
-                                <Volume2 className="w-4 h-4" />
+                                <HugeiconsIcon
+                                    icon={VolumeHighIcon}
+                                    className="w-4 h-4"
+                                />
                             </div>
                             <input
                                 type="range"
@@ -332,9 +345,15 @@ export const TopNav = memo(function TopNav() {
                             className="flex items-center justify-center w-8 h-8 border border-[#444] bg-black hover:bg-[#111] transition-colors"
                         >
                             {isPlaying ? (
-                                <Square className="w-3 h-3 text-white fill-white" />
+                                <HugeiconsIcon
+                                    icon={StopIcon}
+                                    className="w-3 h-3 text-white fill-white"
+                                />
                             ) : (
-                                <Play className="w-3 h-3 text-white fill-white ml-0.5" />
+                                <HugeiconsIcon
+                                    icon={PlayIcon}
+                                    className="w-3 h-3 text-white fill-white ml-0.5"
+                                />
                             )}
                         </button>
 
@@ -347,7 +366,10 @@ export const TopNav = memo(function TopNav() {
                             aria-label="Open saved presets"
                             className="flex items-center justify-center w-8 h-8 border border-[#444] bg-black hover:bg-[#111] transition-colors text-grid-text-secondary hover:text-white"
                         >
-                            <Bookmark className="w-4 h-4" />
+                            <HugeiconsIcon
+                                icon={BookmarkIcon}
+                                className="w-4 h-4"
+                            />
                         </button>
                     </div>
                 </div>
@@ -463,7 +485,10 @@ export const TopNav = memo(function TopNav() {
                                                     }}
                                                     className="flex items-center gap-2 px-3 h-8 border border-[#444] bg-white text-black hover:bg-[#e0e0e0] transition-colors text-xs font-bold uppercase tracking-widest"
                                                 >
-                                                    <Play className="w-3 h-3 fill-current" />
+                                                    <HugeiconsIcon
+                                                        icon={PlayIcon}
+                                                        className="w-3 h-3 fill-current"
+                                                    />
                                                     Play
                                                 </button>
                                                 <button
@@ -486,9 +511,15 @@ export const TopNav = memo(function TopNav() {
                                                     className="flex items-center justify-center w-8 h-8 border border-[#444] bg-black text-[#888] hover:text-white hover:border-[#888] transition-colors"
                                                 >
                                                     {copiedId === mix.id ? (
-                                                        <Check className="w-3.5 h-3.5 text-green-500" />
+                                                        <HugeiconsIcon
+                                                            icon={TickIcon}
+                                                            className="w-3.5 h-3.5 text-green-500"
+                                                        />
                                                     ) : (
-                                                        <Share2 className="w-3.5 h-3.5" />
+                                                        <HugeiconsIcon
+                                                            icon={ShareIcon}
+                                                            className="w-3.5 h-3.5"
+                                                        />
                                                     )}
                                                 </button>
                                                 <button
@@ -503,7 +534,10 @@ export const TopNav = memo(function TopNav() {
                                                     aria-label={`Delete ${mix.name}`}
                                                     className="flex items-center justify-center w-8 h-8 border border-[#444] bg-black text-[#888] hover:text-red-500 hover:border-red-500/50 transition-colors"
                                                 >
-                                                    <Trash2 className="w-3.5 h-3.5" />
+                                                    <HugeiconsIcon
+                                                        icon={Delete02Icon}
+                                                        className="w-3.5 h-3.5"
+                                                    />
                                                 </button>
                                             </div>
                                         </div>

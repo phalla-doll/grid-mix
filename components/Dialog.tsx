@@ -1,7 +1,8 @@
 'use client';
 
 import React, { createContext, useContext, memo } from 'react';
-import { X } from 'lucide-react';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { Cancel01Icon } from '@hugeicons/core-free-icons';
 
 interface DialogContextType {
     open: boolean;
@@ -142,7 +143,7 @@ export const DialogClose = memo(function DialogClose({
             className={`text-[#888] hover:text-white transition-colors ${className}`}
             aria-label="Close dialog"
         >
-            <X className="w-4 h-4" />
+            <HugeiconsIcon icon={Cancel01Icon} className="w-4 h-4" />
         </button>
     );
 });

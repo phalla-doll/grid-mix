@@ -9,7 +9,8 @@ import {
 } from '@/lib/sounds';
 import { SoundTile } from '@/components/SoundTile';
 import { useMixer } from '@/lib/mixer-context';
-import { X } from 'lucide-react';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { Cancel01Icon } from '@hugeicons/core-free-icons';
 
 const CATEGORIES: SoundCategory[] = CATEGORY_ORDER.filter(
     (category) => category !== 'misc'
@@ -70,7 +71,10 @@ export const SoundGrid = memo(function SoundGrid() {
                                         aria-label={`Clear ${formatCategoryLabel(category)} sounds`}
                                         className="flex items-center gap-1.5 text-[10px] sm:text-[11px] font-mono text-[#888] hover:text-white transition-colors tracking-widest uppercase"
                                     >
-                                        <X className="w-3 h-3" />
+                                        <HugeiconsIcon
+                                            icon={Cancel01Icon}
+                                            className="w-3 h-3"
+                                        />
                                         CLEAR
                                     </button>
                                 ) : (
