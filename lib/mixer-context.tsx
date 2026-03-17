@@ -104,6 +104,16 @@ export function MixerProvider({ children }: { children: React.ReactNode }) {
     const [savedMixes, setSavedMixes] = useState<SavedMix[]>([]);
     const [isPending, startTransition] = useTransition();
     const debounceRef = useRef<NodeJS.Timeout | null>(null);
+    const activeSoundsRef = useRef(activeSounds);
+    const isPlayingRef = useRef(isPlaying);
+
+    useEffect(() => {
+        activeSoundsRef.current = activeSounds;
+    }, [activeSounds]);
+
+    useEffect(() => {
+        isPlayingRef.current = isPlaying;
+    }, [isPlaying]);
 
     const normalizeActiveSounds = useCallback(
         (sounds: Record<string, number>) => {
@@ -176,57 +186,132 @@ export function MixerProvider({ children }: { children: React.ReactNode }) {
     }, [activeSounds, isInitialized]);
 
     useEffect(() => {
+        const setupAudioSessionHint = () => {
+            const nav = navigator as Navigator & {
+                audioSession?: { type?: string };
+            };
+            if (!nav.audioSession) return;
+            try {
+                nav.audioSession.type = 'playback';
+            } catch {}
+        };
+
+        let hasInitialized = false;
         const initAudio = () => {
+            if (hasInitialized) return;
+            hasInitialized = true;
+            setupAudioSessionHint();
             engine.init();
             window.removeEventListener('click', initAudio);
+            window.removeEventListener('pointerdown', initAudio);
+            window.removeEventListener('touchstart', initAudio);
+            window.removeEventListener('keydown', initAudio);
         };
+
         window.addEventListener('click', initAudio);
-        return () => window.removeEventListener('click', initAudio);
+        window.addEventListener('pointerdown', initAudio, { passive: true });
+        window.addEventListener('touchstart', initAudio, { passive: true });
+        window.addEventListener('keydown', initAudio);
+        return () => {
+            window.removeEventListener('click', initAudio);
+            window.removeEventListener('pointerdown', initAudio);
+            window.removeEventListener('touchstart', initAudio);
+            window.removeEventListener('keydown', initAudio);
+        };
     }, []);
 
-    useEffect(() => {
-        if ('mediaSession' in navigator) {
-            navigator.mediaSession.metadata = new MediaMetadata({
-                title: 'Soro',
-                artist: 'Ambient Sound Mixer',
-                artwork: [
-                    {
-                        src: '/icon/icon-512',
-                        sizes: '512x512',
-                        type: 'image/png',
-                    },
-                ],
-            });
+    const playActiveSounds = useCallback(() => {
+        Object.entries(activeSoundsRef.current).forEach(([id, vol]) => {
+            playSoundById(id, vol);
+        });
+    }, [playSoundById]);
 
-            navigator.mediaSession.setActionHandler('play', () => {
-                setIsPlaying(true);
-                Object.entries(activeSounds).forEach(([id, vol]) => {
-                    playSoundById(id, vol);
-                });
-            });
-
-            navigator.mediaSession.setActionHandler('pause', () => {
-                setIsPlaying(false);
-                Object.keys(activeSounds).forEach((id) => {
-                    stopSoundById(id);
-                });
-            });
-
-            navigator.mediaSession.setActionHandler('stop', () => {
-                setActiveSounds({});
-                engine.stopAll();
-                setIsPlaying(false);
-            });
-        }
-    }, [activeSounds, playSoundById, stopSoundById]);
+    const stopActiveSounds = useCallback(() => {
+        Object.keys(activeSoundsRef.current).forEach((id) => {
+            stopSoundById(id);
+        });
+    }, [stopSoundById]);
 
     useEffect(() => {
+        const recoverPlayback = async () => {
+            if (!isPlayingRef.current) return;
+            const recovered = await engine.recoverPlayback();
+            if (recovered) return;
+            Object.entries(activeSoundsRef.current).forEach(([id, vol]) => {
+                playSoundById(id, vol);
+            });
+        };
+
+        const onVisibilityChange = () => {
+            if (!document.hidden) {
+                void recoverPlayback();
+            }
+        };
+
+        const onResumeSurface = () => {
+            void recoverPlayback();
+        };
+
+        document.addEventListener('visibilitychange', onVisibilityChange);
+        window.addEventListener('pageshow', onResumeSurface);
+        window.addEventListener('focus', onResumeSurface);
+
+        return () => {
+            document.removeEventListener(
+                'visibilitychange',
+                onVisibilityChange
+            );
+            window.removeEventListener('pageshow', onResumeSurface);
+            window.removeEventListener('focus', onResumeSurface);
+        };
+    }, [playSoundById]);
+
+    useEffect(() => {
+        if (!('mediaSession' in navigator)) return;
+
+        navigator.mediaSession.metadata = new MediaMetadata({
+            title: 'Soro',
+            artist: 'Ambient Sound Mixer',
+            artwork: [
+                {
+                    src: '/soro-og-image-main.png',
+                    sizes: '512x512',
+                    type: 'image/png',
+                },
+            ],
+        });
+
+        navigator.mediaSession.setActionHandler('play', () => {
+            setIsPlaying(true);
+            playActiveSounds();
+        });
+
+        navigator.mediaSession.setActionHandler('pause', () => {
+            setIsPlaying(false);
+            stopActiveSounds();
+        });
+
+        navigator.mediaSession.setActionHandler('stop', () => {
+            setActiveSounds({});
+            engine.stopAll();
+            setIsPlaying(false);
+        });
+
+        return () => {
+            navigator.mediaSession.setActionHandler('play', null);
+            navigator.mediaSession.setActionHandler('pause', null);
+            navigator.mediaSession.setActionHandler('stop', null);
+        };
+    }, [playActiveSounds, stopActiveSounds]);
+
+    useEffect(() => {
         if ('mediaSession' in navigator) {
-            navigator.mediaSession.playbackState = isPlaying
+            navigator.mediaSession.playbackState =
+                isPlaying && Object.keys(activeSounds).length > 0
                 ? 'playing'
                 : 'paused';
         }
-    }, [isPlaying]);
+    }, [activeSounds, isPlaying]);
 
     const toggleSound = useCallback(
         (id: string) => {

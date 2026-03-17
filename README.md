@@ -42,6 +42,31 @@ A beautiful ambient sound mixer for focus, relaxation, and sleep. Blend multiple
 
 - **Media Session API** - Control playback from browser media keys or notifications
 - **Now Playing** - Shows in system media controls
+- **Background playback hardening** - Uses iOS-safe media element fallback when Web Audio reliability is degraded
+
+### Background Playback Notes
+
+- `MediaSession` improves lock-screen controls, but browsers still enforce platform-specific background policies.
+- iOS Safari may suspend Web Audio graphs while backgrounded. The app now falls back to direct `HTMLAudioElement` volume control on iOS WebKit to improve continuity.
+- When supported, the app sets `navigator.audioSession.type = "playback"` after a user gesture to hint media-style playback behavior.
+- On resume from lock/background (`visibilitychange`, `pageshow`, `focus`), the app attempts playback recovery automatically.
+- PWA metadata is included, but install status alone does not guarantee unrestricted background audio on all iOS versions.
+
+### Background Playback Verification Matrix
+
+Run these scenarios manually after `npm run dev`:
+
+1. **iOS Safari**: Start 2-3 sounds, lock screen for 30-60s, unlock, confirm audio continuity and lock-screen play/pause behavior.
+2. **iOS Home Screen app (PWA)**: Install app, repeat lock/unlock flow, confirm playback resume and media controls.
+3. **Android Chrome**: Start sounds, switch apps and lock screen, validate background playback and notification media controls.
+4. **Desktop (Chrome/Safari/Edge)**: Switch tabs/windows, use keyboard media keys, confirm metadata and play/pause stay in sync.
+5. **Stress**: Rapidly toggle multiple sounds and master volume before/after lock cycle to ensure no stuck audio nodes.
+
+Current verification status:
+
+- `npm run lint`: pass
+- `npm run build`: pass
+- Device lock-screen tests: pending manual verification on physical iOS/Android devices
 
 ## Tech Stack
 

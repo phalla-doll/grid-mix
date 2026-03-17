@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { GoogleAnalytics } from '@next/third-parties/google';
 import { geist } from './fonts';
 import './globals.css'; // Global styles
@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     title: 'Soro | Ambient Sound Mixer',
     description:
         'A developer-style minimalist ambient sound mixer with a sharp geometric UI.',
+    manifest: '/manifest.webmanifest',
+    appleWebApp: {
+        capable: true,
+        title: 'Soro',
+        statusBarStyle: 'black-translucent',
+    },
     openGraph: {
         title: 'Soro | Ambient Sound Mixer',
         description:
@@ -28,6 +34,10 @@ export const metadata: Metadata = {
             'A developer-style minimalist ambient sound mixer with a sharp geometric UI.',
         images: ['/soro-og-image-main.png'],
     },
+};
+
+export const viewport: Viewport = {
+    themeColor: '#0a0a0a',
 };
 
 export default function RootLayout({

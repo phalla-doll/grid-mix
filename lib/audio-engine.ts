@@ -8,14 +8,22 @@ interface ActiveNode {
     gainNode: GainNode | null;
 }
 
+type PlaybackMode = 'web-audio-graph' | 'media-element-only';
+
 class AudioEngine {
     private masterVolume = 0.9;
     private activeNodes: Map<string, ActiveNode> = new Map();
     private trackedNodes: Set<ActiveNode> = new Set();
     private audioContext: AudioContext | null = null;
+    private playbackMode: PlaybackMode = 'web-audio-graph';
+    private didResolvePlaybackMode = false;
+    private webAudioResumeFailures = 0;
+    private readonly maxWebAudioResumeFailures = 2;
 
     init() {
         if (typeof window === 'undefined') return;
+        this.resolvePlaybackMode();
+        if (this.playbackMode === 'media-element-only') return;
 
         const AudioContextCtor =
             window.AudioContext ||
@@ -32,7 +40,9 @@ class AudioEngine {
         }
 
         if (this.audioContext.state === 'suspended') {
-            void this.audioContext.resume();
+            void this.audioContext.resume().catch(() => {
+                this.onWebAudioResumeFailure();
+            });
         }
     }
 
@@ -73,6 +83,7 @@ class AudioEngine {
         const audio = new Audio(sound.src);
         audio.loop = sound.loop;
         audio.preload = 'auto';
+        audio.setAttribute('playsinline', 'true');
         const { sourceNode, gainNode } = this.createVolumeGraph(audio);
         audio.volume = gainNode ? 1 : 0;
 
@@ -137,6 +148,35 @@ class AudioEngine {
         this.activeNodes.clear();
         this.trackedNodes.forEach((node) => this.hardStopNode(node));
         this.trackedNodes.clear();
+    }
+
+    getPlaybackMode() {
+        return this.playbackMode;
+    }
+
+    async recoverPlayback() {
+        this.init();
+        if (!this.audioContext || this.playbackMode !== 'web-audio-graph') {
+            return true;
+        }
+
+        if (this.audioContext.state === 'running') {
+            return true;
+        }
+
+        try {
+            await Promise.race([
+                this.audioContext.resume(),
+                new Promise((_, reject) =>
+                    setTimeout(() => reject(new Error('resume-timeout')), 1500)
+                ),
+            ]);
+            this.webAudioResumeFailures = 0;
+            return true;
+        } catch {
+            this.onWebAudioResumeFailure();
+            return false;
+        }
     }
 
     private clamp(value: number) {
@@ -211,6 +251,10 @@ class AudioEngine {
         sourceNode: MediaElementAudioSourceNode | null;
         gainNode: GainNode | null;
     } {
+        if (this.playbackMode === 'media-element-only') {
+            return { sourceNode: null, gainNode: null };
+        }
+
         if (!this.audioContext) {
             return { sourceNode: null, gainNode: null };
         }
@@ -240,6 +284,56 @@ class AudioEngine {
             return;
         }
         node.audio.volume = safeVolume;
+    }
+
+    private resolvePlaybackMode() {
+        if (this.didResolvePlaybackMode || typeof navigator === 'undefined') {
+            return;
+        }
+        this.playbackMode = this.shouldUseMediaElementFallback()
+            ? 'media-element-only'
+            : 'web-audio-graph';
+        this.didResolvePlaybackMode = true;
+    }
+
+    private shouldUseMediaElementFallback() {
+        const ua = navigator.userAgent;
+        const isiOSDevice = /iPad|iPhone|iPod/.test(ua);
+        const isIpadOSDesktopUA =
+            navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
+        const isWebKitEngine =
+            /WebKit/.test(ua) &&
+            !/CriOS|FxiOS|EdgiOS|OPiOS|YaBrowser|DuckDuckGo/.test(ua);
+        return (isiOSDevice || isIpadOSDesktopUA) && isWebKitEngine;
+    }
+
+    private onWebAudioResumeFailure() {
+        this.webAudioResumeFailures += 1;
+        if (this.webAudioResumeFailures < this.maxWebAudioResumeFailures) {
+            return;
+        }
+        this.switchToMediaElementOnly();
+    }
+
+    private switchToMediaElementOnly() {
+        if (this.playbackMode === 'media-element-only') return;
+        this.playbackMode = 'media-element-only';
+        this.activeNodes.forEach((node) => {
+            const currentVolume = this.getCurrentOutputVolume(node);
+            if (node.sourceNode) {
+                try {
+                    node.sourceNode.disconnect();
+                } catch {}
+                node.sourceNode = null;
+            }
+            if (node.gainNode) {
+                try {
+                    node.gainNode.disconnect();
+                } catch {}
+                node.gainNode = null;
+            }
+            node.audio.volume = this.clamp(currentVolume);
+        });
     }
 }
 
