@@ -119,7 +119,7 @@ export const SoundGrid = memo(function SoundGrid() {
                             href="https://manthaa.dev/"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-[#e0e0e0] transition-colors"
+                            className="text-[#e0e0e0] hover:text-white transition-colors"
                         >
                             Mantha
                         </a>
@@ -128,7 +128,7 @@ export const SoundGrid = memo(function SoundGrid() {
                         href="https://github.com/phalla-doll/grid-mix"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[10px] sm:text-[11px] font-mono text-[#e0e0e0] transition-colors tracking-widest uppercase"
+                        className="text-[10px] sm:text-[11px] font-mono text-[#e0e0e0] hover:text-white transition-colors tracking-widest uppercase"
                     >
                         / GITHUB
                     </a>
