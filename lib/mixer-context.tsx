@@ -308,8 +308,8 @@ export function MixerProvider({ children }: { children: React.ReactNode }) {
         if ('mediaSession' in navigator) {
             navigator.mediaSession.playbackState =
                 isPlaying && Object.keys(activeSounds).length > 0
-                ? 'playing'
-                : 'paused';
+                    ? 'playing'
+                    : 'paused';
         }
     }, [activeSounds, isPlaying]);
 
